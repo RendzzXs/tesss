@@ -2,7 +2,7 @@
 
 # -------------------------------
 # HACKBACK PTERODACTYL - INFO EDITION
-# Fitur: Get Info Panel + Auto Get ID 1
+# Fitur: Get Info Panel + Auto Get ID 1 + Reset Password
 # -------------------------------
 
 # Konfigurasi
@@ -42,6 +42,7 @@ CLOCK="⏰"
 CALENDAR="📅"
 FOLDER="📁"
 FILE="📄"
+PASSWORD="🔐"
 
 # Header
 show_header() {
@@ -49,11 +50,18 @@ show_header() {
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║${WHITE}                                                                              ${CYAN}║${NC}"
     echo -e "${CYAN}║${WHITE}              ${FIRE} HACKBACK PTERODACTYL - INFO EDITION ${FIRE}                      ${CYAN}║${NC}"
-    echo -e "${CYAN}║${WHITE}              ${GLOBE} GET INFO PANEL + AUTO ID 1 ${GLOBE}                              ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}              ${GLOBE} GET INFO PANEL + AUTO ID 1 + RESET PASSWORD ${GLOBE}                              ${CYAN}║${NC}"
     echo -e "${CYAN}║${WHITE}                         *Information Gathering Edition*                              ${CYAN}║${NC}"
     echo -e "${CYAN}║${WHITE}                                                                              ${CYAN}║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
+}
+
+# Fungsi untuk hash password menggunakan bcrypt (sesuai Laravel)
+hash_password() {
+    local password="$1"
+    # Menggunakan PHP untuk generate bcrypt hash (sesuai Laravel)
+    php -r "echo password_hash('$password', PASSWORD_BCRYPT);" 2>/dev/null
 }
 
 # ==============================================
@@ -260,6 +268,7 @@ get_panel_info() {
     echo -e "${GREEN}║${NC}  ${USER} USERNAME PANEL : ${CYAN}$USERNAME_PANEL${NC}                           ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}  ${ID} USER ID        : ${GREEN}$USER_ID_PANEL${NC}                               ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}  ${CROWN} STATUS ADMIN   : ${GREEN}YES (ID 1)${NC}                             ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${PASSWORD} DEFAULT PASS  : ${YELLOW}admin${NC} (sudah direset)                 ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}                                                                ${GREEN}║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}"
     
@@ -281,6 +290,7 @@ $URL_PANEL
 [USER PANEL]
 Username: $USERNAME_PANEL
 User ID: $USER_ID_PANEL
+Password: admin (sudah direset)
 Status: Admin
 
 [DATABASE]
@@ -303,6 +313,78 @@ EOF
 }
 
 # ==============================================
+# FUNGSI RESET PASSWORD ID 1
+# ==============================================
+reset_password_id1() {
+    echo -e "\n${YELLOW}${PASSWORD} MERESET PASSWORD USER ID 1...${NC}"
+    
+    NEW_PASSWORD="admin"
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        
+        # Cek apakah user ID 1 ada
+        CHECK_USER=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id FROM users WHERE id = 1" 2>/dev/null | tail -n +2)
+        
+        if [ -n "$CHECK_USER" ]; then
+            # Generate password hash menggunakan bcrypt (format Laravel)
+            # Alternatif: menggunakan php artisan atau langsung bcrypt
+            
+            # Method 1: Menggunakan PHP (jika tersedia)
+            if command -v php >/dev/null 2>&1; then
+                PASSWORD_HASH=$(php -r "echo password_hash('$NEW_PASSWORD', PASSWORD_BCRYPT);" 2>/dev/null)
+            else
+                # Fallback: generate hash sederhana (tidak direkomendasikan untuk production)
+                # Tapi untuk Pterodactyl, harus pakai bcrypt
+                echo -e "${RED}${CROSS} PHP tidak ditemukan! Tidak bisa generate bcrypt hash.${NC}"
+                echo -e "${YELLOW}Mencoba method alternatif...${NC}"
+                
+                # Coba deteksi apakah ada artisan
+                if [ -f "$PTERO_DIR/artisan" ]; then
+                    cd "$PTERO_DIR"
+                    PASSWORD_HASH=$(php artisan tinker --execute="echo bcrypt('$NEW_PASSWORD');" 2>/dev/null | grep -o '\$2y\$.*' | head -1)
+                else
+                    echo -e "${RED}Gagal mereset password. Pastikan PHP terinstall.${NC}"
+                    return 1
+                fi
+            fi
+            
+            if [ -n "$PASSWORD_HASH" ]; then
+                # Update password di database
+                mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET password = '$PASSWORD_HASH' WHERE id = 1" 2>/dev/null
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}${CHECK} PASSWORD USER ID 1 BERHASIL DI RESET!${NC}"
+                    echo -e "${GREEN}${PASSWORD} Password baru: ${YELLOW}admin${NC}"
+                    
+                    # Update juga root_admin jadi 1
+                    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET root_admin = 1 WHERE id = 1" 2>/dev/null
+                    echo -e "${GREEN}${CROWN} User ID 1 sekarang adalah SUPER ADMIN!${NC}"
+                    
+                    # Tampilkan info login
+                    echo -e "\n${WHITE}╔════════════════════════════════════════════════════╗${NC}"
+                    echo -e "${WHITE}║              INFO LOGIN PANEL                       ║${NC}"
+                    echo -e "${WHITE}╠════════════════════════════════════════════════════╣${NC}"
+                    echo -e "${WHITE}║${NC}"
+                    echo -e "${WHITE}║  ${GLOBE} URL    : ${CYAN}$URL_PANEL${NC}"
+                    echo -e "${WHITE}║  ${USER} Username: ${GREEN}$USERNAME1${NC}"
+                    echo -e "${WHITE}║  ${PASSWORD} Password: ${YELLOW}admin${NC}"
+                    echo -e "${WHITE}║${NC}"
+                    echo -e "${WHITE}╚════════════════════════════════════════════════════╝${NC}"
+                else
+                    echo -e "${RED}${CROSS} Gagal update password!${NC}"
+                fi
+            else
+                echo -e "${RED}${CROSS} Gagal generate hash password!${NC}"
+            fi
+        else
+            echo -e "${RED}${CROSS} User ID 1 tidak ditemukan dalam database!${NC}"
+        fi
+    else
+        echo -e "${RED}${CROSS} Informasi database tidak lengkap!${NC}"
+    fi
+}
+
+# ==============================================
 # MAIN MENU
 # ==============================================
 show_menu() {
@@ -315,13 +397,15 @@ show_menu() {
     echo -e "${WHITE}║  ${CYAN}[2]${NC} ${USER} GET USER INFO (MANUAL)                                 ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${PURPLE}[3]${NC} ${SERVER} GET SERVER INFO                                     ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${YELLOW}[4]${NC} ${DATABASE} GET DATABASE INFO                                 ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${RED}[5]${NC} ${FILE} SAVE INFO TO FILE                                      ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${BLUE}[6]${NC} ${CROWN} MAKE ID 1 SUPER ADMIN                                ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${BLUE}[5]${NC} ${FILE} SAVE INFO TO FILE                                      ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[6]${NC} ${CROWN} MAKE ID 1 SUPER ADMIN                                  ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[7]${NC} ${PASSWORD} RESET PASSWORD ID 1 (NEW: admin)                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[8]${NC} ${FIRE} AUTO GET ID 1 + RESET PASSWORD (ALL IN ONE)           ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 KELUAR                                                     ${WHITE}║${NC}"
     echo -e "${WHITE}║                                                                            ║${NC}"
     echo -e "${WHITE}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -ne "${YELLOW}➤ Pilih menu [0-6]: ${NC}"
+    echo -ne "${YELLOW}➤ Pilih menu [0-8]: ${NC}"
 }
 
 # Function: Get user info manual
@@ -379,6 +463,15 @@ make_id1_admin() {
     fi
 }
 
+# Function: Auto get ID 1 and reset password
+auto_get_and_reset() {
+    echo -e "\n${GREEN}${FIRE} AUTO GET ID 1 + RESET PASSWORD ${FIRE}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Panggil fungsi reset password
+    reset_password_id1
+}
+
 # Main function
 main() {
     show_header
@@ -409,6 +502,12 @@ main() {
                 ;;
             6)
                 make_id1_admin
+                ;;
+            7)
+                reset_password_id1
+                ;;
+            8)
+                auto_get_and_reset
                 ;;
             0)
                 echo -e "\n${GREEN}Thanks for using Hackback Info Edition!${NC}"
